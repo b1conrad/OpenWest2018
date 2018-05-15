@@ -5,7 +5,7 @@ ruleset OpenWest2018.kiosk {
   }
   global {
     __testing = { "queries": [ { "name": "__testing" } ],
-                  "events": [ ] }
+                  "events": [ {"domain": "kiosk", "type": "new_pc_host", "attrs": [ "pc_host"] } ] }
     lcars_url = "https://raw.githubusercontent.com/joernweissenborn/lcars/master/lcars/css/lcars.min.css";
     lcars = function() {
       http:get(lcars_url){"content"}
@@ -57,17 +57,29 @@ ruleset OpenWest2018.kiosk {
 >>
     }
     index = function(bg_color) {
-      pc_host = meta:host; // personal cloud host; for now the same
+      pc_host = ent:pc_host; // personal cloud host
 
       img_host = "https://upload.wikimedia.org/wikipedia/en/thumb/2/27/";
       img_name = "Flag_of_the_United_Federation_of_Planets.svg";
       img_link = <<#{img_host}#{img_name}/640px-#{img_name}.png>>;
 
-      img_qrid = <<#{meta:host}/qrcode.html?#{pc_host}/qr/tag/scanned?id=>>;
+      img_qrid = <<#{meta:host}/kiosk.html?#{pc_host}>>;
 
       <<#{header("OpenWest 2018",bg_color)}
-<a href="#{img_qrid+"1387"}"><img src="#{img_link}" alt="#{img_name}"></a>
+<a href="#{img_qrid}"><img src="#{img_link}" alt="#{img_name}"></a>
 #{footer()}>>
+    }
+  }
+  rule initialize {
+    select when wrangler ruleset_added where event:attr("rids") >< meta:rid
+    fired {
+      ent:pc_host := "http://picos.byu.edu:8080";
+    }
+  }
+  rule new_pc_host {
+    select when kiosk new_pc_host
+    fired {
+      ent:pc_host := event:attr("pc_host");
     }
   }
 }
