@@ -27,7 +27,13 @@ ruleset OpenWest2018.attendee {
     select when wrangler ruleset_added where rids >< meta:rid
     fired {
       raise wrangler event "channel_creation_requested"
-        attributes { "name": "introduction", "type": "public" }
+        attributes { "name": "introduction", "type": "public" };
+      raise visual event "config"
+        attributes { "width":50, "height": 50 };
+      raise wrangler event "subscription"
+        attributes { "wellKnown_Tx": "KmHBdDKH9VU8Kno6ZDH1mP",
+          "Rx_role": "member", "Tx_role": "collection", 
+          "name": name(), "channel_type": "subscription" };
     }
   }
   rule record_intro_channel {
