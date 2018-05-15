@@ -8,7 +8,7 @@ The components are:
 3. a multitude of smart phones
 
 ### The registration kiosk
-A small machine at the booth, running a pico engine.
+A small machine at the booth, running a pico engine. The file registration/kiosk.html must be copied into the pico engine's public folder.
 
 It has a pico with the OpenWest2018.kiosk ruleset installed.
 
