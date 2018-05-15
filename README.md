@@ -41,6 +41,8 @@ This pico has a child pico, Attendees, with these rulesets installed:
 It also has a new channel (/qr rewrite), with the corresponding ECI
 registered with the root pico's rewrite ruleset to handle events from owners.
 
+Finally, the ruleset OpenWest2018.attendee *must* be registered with this pico engine.
+
 ### The smart phones
 Each visitor scans a QR Code at the kiosk using her smart phone.
 
