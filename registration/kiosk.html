@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+<title>QR code for OpenWest2018 kiosk</title>
+<script src="js/jquery-3.1.0.min.js"></script>
+<!-- thanks to Jerome Etienne http://jeromeetienne.github.io/jquery-qrcode/ -->
+<script type="text/javascript" src="js/jquery.qrcode.js"></script>
+<script type="text/javascript" src="js/qrcode.js"></script>
+<script type="text/javascript">
+$(function(){
+  var pc_host = location.search.substring(1);
+  var problem = function(err){
+    $("p#postlude").append("Problem: "+JSON.stringify(err));
+  }
+  var url = pc_host + "/id/ids/need_next";
+  $("p#prelude").append(url);
+  $.getJSON(url,function(data){
+    if(data
+        && data.directives
+        && data.directives[0]
+        && data.directives[0].name === "next"
+        && data.directives[0].options.id){
+      var url = pc_host + "/qr/tag/scanned?id=" + data.directives[0].options.id;
+      $("p#prelude").empty().append($("<a>",{href:url,text:url}));
+      $("div").qrcode(url);	
+      var canvas = $("div canvas").get(0);
+      var context = canvas.getContext("2d");
+      var logo = new Image();
+      logo.src = "pico-logo-48x48.png";
+      logo.onload = function(){
+        context.drawImage(logo,104,104);
+      }
+      var pngUrl = canvas.toDataURL();
+      $("p#postlude").append($("<a>",{href:pngUrl,text:"image link"}));
+    } else {
+      problem(data);
+    }
+  }).fail(problem);
+});
+</script>
+</head>
+<body>
+<p id="prelude"></p> 
+<div style="border:1px dashed silver;padding:5px;float:left"></div>
+<br clear="all">
+<p id="postlude"></p> 
+</body>
+</html>
