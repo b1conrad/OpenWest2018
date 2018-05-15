@@ -1,6 +1,5 @@
 ruleset OpenWest2018.web {
   meta {
-    use module OpenWest2018.keys alias ids
     provides header, footer
     shares __testing, index, lcars
   }
@@ -67,7 +66,7 @@ ruleset OpenWest2018.web {
       img_qrid = <<#{meta:host}/qrcode.html?#{pc_host}/qr/tag/scanned?id=>>;
 
       <<#{header("OpenWest 2018",bg_color)}
-<a href="#{img_qrid+ids:tag_id(ids:current_pin())}"><img src="#{img_link}" alt="#{img_name}"></a>
+<a href="#{img_qrid+"1387"}"><img src="#{img_link}" alt="#{img_name}"></a>
 #{footer()}>>
     }
   }
