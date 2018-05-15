@@ -1,4 +1,4 @@
-ruleset OpenWest2018.web {
+ruleset OpenWest2018.kiosk {
   meta {
     provides header, footer
     shares __testing, index, lcars
