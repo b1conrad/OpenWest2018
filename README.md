@@ -33,13 +33,13 @@ A child pico, OpenWest 2018, has these ruleset installed:
 It also has a new channel (/id rewrite), with the corresponding ECI
 registered with the root pico's rewrite ruleset to handle events from the kiosk.
 
+It also has a new channel (/qr rewrite), with the corresponding ECI
+registered with the root pico's rewrite ruleset to handle events from owners.
+
 This pico has a child pico, Attendees, with these rulesets installed:
 1. io.picolabs.subscription
 2. io.picolabs.collection
 3. OpenWest2018.collection
-
-It also has a new channel (/qr rewrite), with the corresponding ECI
-registered with the root pico's rewrite ruleset to handle events from owners.
 
 Finally, the ruleset OpenWest2018.attendee *must* be registered with this pico engine.
 
