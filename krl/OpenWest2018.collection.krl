@@ -34,10 +34,12 @@ ruleset OpenWest2018.collection {
     foreach my_members() setting(subs)
     pre {
       key = subs{"Tx"};
-      name = ent:attendees{key} || attendee_name(key)
+      name = ent:attendees{key} || attendee_name(key);
+      connection_count = Wrangler:skyQuery(key, "OpenWest2018.attendee", "connection_count");
     }
     fired {
       ent:attendees{key.klog("key")} := name.klog("name");
+      ent:scores{key} := connection_count;
     }
   }
   rule update_high_scores {
