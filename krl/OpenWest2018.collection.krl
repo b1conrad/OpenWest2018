@@ -16,7 +16,11 @@ ruleset OpenWest2018.collection {
       ent:attendees{key} || Wrangler:skyQuery(key, "OpenWest2018.attendee", "name")
     }
     high_scores = function() {
-      ent:scores.values().sort("ciremun")
+      ent:scores.keys()
+        .map(function(v){{"key":attendee_name(v),"count":ent:scores{v}}})
+        .sort(function(a,b){-(a{"count"} <=> b{"count"})})
+        .collect(function(v){"count="+v{"count"}})
+        .map(function(v){v.map(function(w){w{"key"}})})
     }
   }
   rule new_member {
@@ -35,7 +39,8 @@ ruleset OpenWest2018.collection {
     pre {
       key = subs{"Tx"};
       name = ent:attendees{key} || attendee_name(key);
-      connection_count = Wrangler:skyQuery(key, "OpenWest2018.attendee", "connection_count");
+      temp = Wrangler:skyQuery(key, "OpenWest2018.attendee", "connection_count");
+      connection_count = temp like re#\d+# => temp.as("Number") | 0;
     }
     fired {
       ent:attendees{key.klog("key")} := name.klog("name");
