@@ -3,13 +3,14 @@ ruleset OpenWest2018.attendee {
     use module io.picolabs.visual_params alias vp
     use module io.picolabs.subscription alias Subs
     use module io.picolabs.wrangler alias wrangler
-    shares __testing, tag_line, name, connections
+    shares __testing, tag_line, name, connections, connection_count
   }
   global {
     __testing = { "queries": [ { "name": "__testing" },
                                { "name": "tag_line" },
                                { "name": "name" },
-                               { "name": "connections"  }],
+                               { "name": "connections"  },
+                               { "name": "connection_count"  }],
                   "events": [ {"domain": "about_me", "type": "new_tag_line", "attrs": ["tag_line"]},
                               {"domain": "about_me", "type": "name_provided", "attrs": ["name"]} ] }
     tag_line = function() {
@@ -21,6 +22,9 @@ ruleset OpenWest2018.attendee {
     connections = function() {
       Subs:established("Rx_role","peer")
         .map(function(v){wrangler:skyQuery(v{"Tx"},meta:rid,"name")})
+    }
+    connection_count = function() {
+      Subs:established("Rx_role","peer").length();
     }
   }
   rule intialization {
@@ -87,7 +91,6 @@ ruleset OpenWest2018.attendee {
   rule wrangler_subscription_added {
     select when wrangler subscription_added
     pre {
-      connection_count = Subs:established("Rx_role","peer").length();
       attendees_subs = Subs:established("Rx_role","member")[0];
       attendees_eci = attendees_subs{"Tx"};
       attendees_id = attendees_subs{"Id"};
@@ -95,6 +98,6 @@ ruleset OpenWest2018.attendee {
     if attendees_eci && attendees_id then
       event:send({"eci":attendees_eci,
         "domain": "attendee", "type": "new_connection",
-        "attrs": {"id":attendees_id,"connection_count":connection_count}});
+        "attrs": {"id":attendees_id,"connection_count":connection_count()}});
   }
 }
