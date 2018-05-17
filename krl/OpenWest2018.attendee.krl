@@ -35,7 +35,7 @@ ruleset OpenWest2018.attendee {
       raise visual event "config"
         attributes { "width":50, "height": 50 };
       raise wrangler event "subscription"
-        attributes { "wellKnown_Tx": "KmHBdDKH9VU8Kno6ZDH1mP",
+        attributes { "wellKnown_Tx": "XRA3FHUDCzr8LhFiEoWtbA",
           "Rx_role": "member", "Tx_role": "collection", 
           "name": name(), "channel_type": "subscription" };
     }
