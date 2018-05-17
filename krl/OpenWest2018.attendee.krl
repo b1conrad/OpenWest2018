@@ -84,4 +84,17 @@ ruleset OpenWest2018.attendee {
       raise wrangler event "inbound_rejection"
         attributes { "Rx": event:attr("Rx") }    }
   }
+  rule wrangler_subscription_added {
+    select when wrangler subscription_added
+    pre {
+      connection_count = Subs:established("Rx_role","peer").length();
+      attendees_subs = Subs:established("Rx_role","member")[0];
+      attendees_eci = attendees_subs{"Tx"};
+      attendees_id = attendees_subs{"Id"};
+    }
+    if attendees_eci && attendees_id then
+      event:send({"eci":attendees_eci,
+        "domain": "attendee", "type": "new_connection",
+        "attrs": {"id":attendees_id,"connection_count":connection_count}});
+  }
 }
