@@ -16,7 +16,7 @@ ruleset OpenWest2018.collection {
       ent:attendees{key} || Wrangler:skyQuery(key, "OpenWest2018.attendee", "name")
     }
     high_scores = function() {
-      ent:scores.sort("ciremun")
+      ent:scores.values().sort("ciremun")
     }
   }
   rule new_member {
