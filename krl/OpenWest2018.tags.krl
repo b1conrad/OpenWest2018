@@ -2,23 +2,15 @@ ruleset OpenWest2018.tags {
   meta {
     use module OpenWest2018.keys alias ids
     use module io.picolabs.wrangler alias wrangler
+    use module io.picolabs.cookies alias cookies
     shares __testing
   }
   global {
     __testing = { "queries": [ { "name": "__testing" } ],
                   "events": [ ] }
     namespace = "ow18"
-    cookies = function(_headers) {
-      arg = event:attr("_headers") || _headers;
-      arg{"cookie"}.isnull() => {} |
-      arg{"cookie"}                      //.klog("cookie")
-        .split("; ")                     //.klog("split")
-        .map(function(v){v.split("=")})  //.klog("map1")
-        .collect(function(v){v.head()})  //.klog("collect")
-        .map(function(v){v.head()[1]})   //.klog("map2")
-    }
-    child_rids = ["io.picolabs.subscription","OpenWest2018.attendee"];
-    child_specs = { "rids": child_rids};
+    child_specs = {
+      "rids": ["io.picolabs.subscription","OpenWest2018.attendee"] };
   }
   rule initialization {
     select when wrangler ruleset_added where event:attr("rids") >< meta:rid
@@ -36,7 +28,7 @@ ruleset OpenWest2018.tags {
         && ids:valid(candidate_id);
     }
     if not ok then
-      send_directive("invalid tag",{"id":id,"page":"reject"})
+      send_directive("invalid tag",{"id":candidate_id,"page":"reject"})
     fired { last; } // may need to ban
   }
   rule tag_first_scan {
@@ -62,9 +54,9 @@ ruleset OpenWest2018.tags {
     select when tag scanned id re#^(\d{15})$# setting(id)
     pre {
       key = namespace + id;
-      wellKnown_Rx = cookies(){"wellKnown_Rx"};
+      whoami = cookies:cookies(){"whoami"};
     }
-    if wellKnown_Rx.isnull()
+    if whoami.isnull()
       then send_directive("unknown scanner",{"id": id,"page":"recovery"});
     fired {
       ent:owners{key} := time:now();
