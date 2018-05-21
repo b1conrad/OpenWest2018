@@ -62,6 +62,8 @@ ruleset OpenWest2018.tags {
       ent:owners{key} := time:now();
       raise tag event "recovery_needed" attributes event:attrs;
       last;
+    } else {
+      ent:scanned_by := whoami;
     }
   }
   rule tag_subsequent_scan {
@@ -71,10 +73,15 @@ ruleset OpenWest2018.tags {
     }
     if ent:owners >< key
       then send_directive("subsequent scan",
-        {"id": id,"last scanned":ent:owners{key},"page":"about_me"});
+        {"id": id,"last scanned":ent:owners{key},"page":"about_me",
+          "scanned_by": ent:scanned_by
+        });
     fired {
       ent:owners{key} := time:now();
-      raise tag event "subsequent_scan" attributes event:attrs;
+      raise tag event "subsequent_scan"
+        attributes event:attrs.put("scanned_by", ent:scanned_by);
+    } finally {
+      clear ent:scanned_by;
     }
   }
 }
