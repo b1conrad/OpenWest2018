@@ -8,7 +8,6 @@ ruleset OpenWest2018.tags {
   global {
     __testing = { "queries": [ { "name": "__testing" } ],
                   "events": [ ] }
-    namespace = "ow18"
     child_specs = {
       "rids": ["io.picolabs.subscription","OpenWest2018.attendee"] };
   }
@@ -34,13 +33,13 @@ ruleset OpenWest2018.tags {
   rule tag_first_scan {
     select when tag scanned id re#^(\d{15})$# setting(id)
     pre {
-      key = namespace + id;
+      key = id;
     }
     if not (ent:owners >< key) then every {
       send_directive("first scan",{"id": id,"page":"sign-up"});
       event:send({"eci":wrangler:parent_eci(),
         "domain": "owner", "type": "creation",
-        "attrs": child_specs.put({"name":namespace+ids:as_pin(id)})
+        "attrs": child_specs.put({"name":ids:as_pin(id)})
       });
     }
     fired {
@@ -53,7 +52,7 @@ ruleset OpenWest2018.tags {
   rule scanner_unknown {
     select when tag scanned id re#^(\d{15})$# setting(id)
     pre {
-      key = namespace + id;
+      key = id;
       whoami = cookies:cookies(){"whoami"};
     }
     if whoami.isnull()
@@ -69,7 +68,7 @@ ruleset OpenWest2018.tags {
   rule tag_subsequent_scan {
     select when tag scanned id re#^(\d{15})$# setting(id)
     pre {
-      key = namespace + id;
+      key = id;
     }
     if ent:owners >< key
       then send_directive("subsequent scan",

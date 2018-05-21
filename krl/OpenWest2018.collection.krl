@@ -24,7 +24,7 @@ ruleset OpenWest2018.collection {
     }
     pin_as_Rx = function(pin) {
       ent:attendees
-        .filter(function(v){v.substr(4)==pin})
+        .filter(function(v){v==pin})
         .keys().head()
     }
   }
