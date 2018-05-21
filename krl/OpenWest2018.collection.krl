@@ -2,7 +2,7 @@ ruleset OpenWest2018.collection {
   meta {
     use module io.picolabs.collection alias my
     use module io.picolabs.wrangler alias Wrangler
-    shares __testing, my_members, high_scores
+    shares __testing, my_members, high_scores, pin_as_Rx
   }
   global {
     __testing = { "queries": [ { "name": "__testing" },
@@ -22,9 +22,14 @@ ruleset OpenWest2018.collection {
         .collect(function(v){"count="+v{"count"}})
         .map(function(v){v.map(function(w){w{"key"}})})
     }
+    pin_as_Rx = function(pin) {
+      ent:attendees
+        .filter(function(v){v.substr(4)==pin})
+        .keys().head()
+    }
   }
   rule new_member {
-    select when wrangler subscription_added
+    select when collection new_member
     pre {
       key = event:attr("Tx");
       name = event:attr("name");
