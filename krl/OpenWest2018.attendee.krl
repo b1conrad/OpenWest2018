@@ -3,7 +3,7 @@ ruleset OpenWest2018.attendee {
     use module io.picolabs.visual_params alias vp
     use module io.picolabs.subscription alias Subs
     use module io.picolabs.wrangler alias wrangler
-    shares __testing, tag_line, name, connections, connection_count
+    shares __testing, tag_line, name, connections, connection_count, about_me
   }
   global {
     __testing = { "queries": [ { "name": "__testing" },
@@ -25,6 +25,23 @@ ruleset OpenWest2018.attendee {
     }
     connection_count = function() {
       Subs:established("Rx_role","peer").length();
+    }
+    about_me = function() {
+      my_name = name();
+      intro_url = <</sky/event/#{ent:intro_channel_id}/none/intro/tag_scanned>>;
+      <<<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>#{my_name}</title>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <h1>#{my_name}</h1>
+    <h2>#{ent:tag_line}</h2>
+    <a href="#{intro_url}">#{ent:intro_channel_id}</a>
+  </body>
+</html>
+>>
     }
   }
   rule intialization {
