@@ -76,7 +76,10 @@ $(function(){
   rule tag_subsequent_scan {
     select when tag subsequent_scan
     pre {
-      html = <<#{header("welcome back")}<h1>Welcome back</h1>#{footer()}>>;
+      id = event:attr("id");
+      pin = ids:as_pin(id);
+      scanned_by = event:attr("scanned_by");
+      html = <<#{header(pin)}<h1>Welcome #{scanned_by}</h1>#{footer()}>>;
     }
     send_directive("_html",{"content":html});
   }
