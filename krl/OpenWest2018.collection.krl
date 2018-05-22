@@ -13,7 +13,8 @@ ruleset OpenWest2018.collection {
       my:members()
     }
     attendee_name = function(key) {
-      ent:attendees{key} || Wrangler:skyQuery(key, "OpenWest2018.attendee", "name")
+      name = Wrangler:skyQuery(key, "OpenWest2018.attendee", "name");
+      name{"error"} => ent:attendees{key} | name
     }
     high_scores = function() {
       ent:scores.keys()
@@ -48,7 +49,7 @@ ruleset OpenWest2018.collection {
     foreach my_members() setting(subs)
     pre {
       key = subs{"Tx"};
-      name = ent:attendees{key} || attendee_name(key);
+      name = ent:attendees{key};
       temp = Wrangler:skyQuery(key, "OpenWest2018.attendee", "connection_count");
       connection_count = temp like re#\d+# => temp.as("Number") | 0;
     }
