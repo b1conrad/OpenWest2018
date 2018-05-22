@@ -44,6 +44,8 @@ ruleset OpenWest2018.attendee {
         attributes { "wellKnown_Tx": "E4vTvKQ3M2eXUwLujhBWJd",
           "Rx_role": "member", "Tx_role": "collection", 
           "name": name(), "channel_type": "subscription" };
+      raise wrangler event "install_rulesets_requested"
+        attributes { "rid": "OpenWest2018.attendee.ui" }
     }
   }
   rule record_intro_channel {

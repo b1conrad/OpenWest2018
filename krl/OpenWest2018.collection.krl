@@ -2,7 +2,7 @@ ruleset OpenWest2018.collection {
   meta {
     use module io.picolabs.collection alias my
     use module io.picolabs.wrangler alias Wrangler
-    shares __testing, my_members, high_scores, pin_as_Rx
+    shares __testing, my_members, high_scores, pin_as_Rx, about_pin
   }
   global {
     __testing = { "queries": [ { "name": "__testing" },
@@ -26,6 +26,11 @@ ruleset OpenWest2018.collection {
       ent:attendees
         .filter(function(v){v==pin})
         .keys().head()
+    }
+    about_pin = function(pin) {
+      Tx = pin_as_Rx(pin);
+      html = Wrangler:skyQuery(Tx, "OpenWest2018.attendee.ui", "about_me");
+      html{"error"} => html{"skyQueryError"} | html
     }
   }
   rule new_member {
