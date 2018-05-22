@@ -85,7 +85,13 @@ ruleset OpenWest2018.attendee {
                           | null;
     }
     if Tx.klog("DID") like re#^.{22}$# then every {
-      send_directive("met",{"name":ent:name,"about me":ent:tag_line, "peer":whoami, "peer_Tx": Tx})
+      send_directive("met",{"name":ent:name,"about me":ent:tag_line, "peer":whoami, "peer_Tx": Tx});
+    }
+    fired {
+      raise wrangler event "subscription"
+        attributes { "wellKnown_Tx": Tx,
+          "Rx_role": "peer", "Tx_role": "peer", 
+          "name": name()+"<=>"+whoami, "channel_type": "subscription" };
     }
   }
   rule auto_accept {
