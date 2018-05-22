@@ -32,7 +32,7 @@ ruleset OpenWest2018.attendee.ui {
     }
     about_me = function() {
       my_name = me:name();
-      intro_url = <</sky/event/#{me:intro_channel_id()}/none/intro/tag_scanned>>;
+      intro_url = <</sky/event/#{me:intro_channel_id()}/intro/tag/scanned>>;
       scripts = <<<script src="#{pc_host}/js/jquery-3.1.0.min.js"></script>
 <!-- thanks to Jerome Etienne http://jeromeetienne.github.io/jquery-qrcode/ -->
 <script type="text/javascript" src="#{pc_host}/js/jquery.qrcode.js"></script>
