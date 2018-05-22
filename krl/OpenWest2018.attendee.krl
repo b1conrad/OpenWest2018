@@ -19,7 +19,7 @@ ruleset OpenWest2018.attendee {
       ent:tag_line
     }
     name = function() {
-      ent:name || vp:dname()
+      ent:name || ent:pin
     }
     connections = function() {
       Subs:established("Rx_role","peer")
@@ -35,6 +35,7 @@ ruleset OpenWest2018.attendee {
   rule intialization {
     select when wrangler ruleset_added where event:attr("rids") >< meta:rid
     fired {
+      ent:pin := vp:dname();
       raise wrangler event "channel_creation_requested"
         attributes { "name": "introduction", "type": "public" };
       raise visual event "config"
@@ -75,6 +76,14 @@ ruleset OpenWest2018.attendee {
       ent:name := name;
     }
   }
+  rule avoid_self_to_self {
+    select when tag scanned
+    pre {
+      whoami = cookies:cookies(){"whoami"};
+    }
+    if whoami == ent:pin then noop();
+    fired { last }
+  }
   rule tag_scanned {
     select when tag scanned
     pre {
@@ -85,12 +94,12 @@ ruleset OpenWest2018.attendee {
                           | null;
     }
     if Tx.klog("DID") like re#^.{22}$# then every {
-      send_directive("met",{"name":ent:name,"about me":ent:tag_line, "peer":whoami, "peer_Tx": Tx});
+      send_directive("met",{"name":name(),"about me":ent:tag_line, "peer":whoami, "peer_Tx": Tx});
     }
     fired {
       raise wrangler event "subscription"
         attributes { "wellKnown_Tx": Tx,
-          "Rx_role": "peer", "Tx_role": "peer", 
+          "Rx_role": "peer", "Tx_role": "peer",
           "name": name()+"<=>"+whoami, "channel_type": "subscription" };
     }
   }
