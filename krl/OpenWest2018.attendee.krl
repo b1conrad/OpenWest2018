@@ -2,6 +2,7 @@ ruleset OpenWest2018.attendee {
   meta {
     use module io.picolabs.visual_params alias vp
     use module io.picolabs.subscription alias Subs
+    use module io.picolabs.cookies alias cookies
     use module io.picolabs.wrangler alias wrangler
     provides name, tag_line, intro_channel_id
     shares __testing, tag_line, name, connections, connection_count
@@ -76,7 +77,16 @@ ruleset OpenWest2018.attendee {
   }
   rule tag_scanned {
     select when tag scanned
-    send_directive("met",{"name":ent:name,"about me":ent:tag_line})
+    pre {
+      whoami = cookies:cookies(){"whoami"};
+      attendees_subs = Subs:established("Rx_role","member").head();
+      eci = attendees_subs{"Tx"};
+      Tx = whoami && eci => wrangler:skyQuery(eci,"OpenWest2018.collection","pin_as_Rx", {"pin": whoami})
+                          | null;
+    }
+    if Tx.klog("DID") like re#^.{22}$# then every {
+      send_directive("met",{"name":ent:name,"about me":ent:tag_line, "peer":whoami, "peer_Tx": Tx})
+    }
   }
   rule auto_accept {
     select when wrangler inbound_pending_subscription_added
