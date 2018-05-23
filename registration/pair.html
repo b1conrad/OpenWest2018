@@ -10,7 +10,7 @@ div { width: 48%; height: 100%; float: left; }
 div { border-right: 1px dashed silver; margin-right: 5px; }
 </style>
 <script type="text/javascript">
-var theURL = "http://picos.byu.edu:8080/OpenWest2018.collection/about_pin.html?pin=";
+var theURL = "OpenWest2018.collection/about_pin.html?pin=";
 function frameFlip(theInput,theId){
   var theIframe = document.getElementById(theId);
   var thePin = theInput.value;
@@ -20,12 +20,12 @@ function frameFlip(theInput,theId){
   </head>
   <body>
 <div>
-<input onchange="frameFlip(this,'leftIframe')">
+pin: <input onchange="frameFlip(this,'leftIframe')">
 <iframe id="leftIframe" src="">
 </iframe>
 </div>
 <div style="border:none">
-<input onchange="frameFlip(this,'rightIframe')">
+pin: <input onchange="frameFlip(this,'rightIframe')">
 <iframe id="rightIframe" src="">
 </iframe>
 </div>
