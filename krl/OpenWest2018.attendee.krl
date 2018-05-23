@@ -56,7 +56,7 @@ ruleset OpenWest2018.attendee {
     pre {
       channel = event:attr("channel");
       pertinent = channel{"name"}=="introduction"
-                && channel{"type"}=="subscription"
+                && channel{"type"}=="public"
     }
     if pertinent then noop();
     fired {
