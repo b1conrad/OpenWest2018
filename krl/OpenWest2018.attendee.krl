@@ -37,6 +37,7 @@ ruleset OpenWest2018.attendee {
   rule intialization {
     select when wrangler ruleset_added where event:attr("rids") >< meta:rid
     fired {
+      ent:connections := {};
       ent:pin := wrangler:myself(){"name"};
       raise wrangler event "channel_creation_requested"
         attributes { "name": "introduction", "type": "public" };
@@ -45,7 +46,7 @@ ruleset OpenWest2018.attendee {
       raise wrangler event "subscription"
         attributes { "wellKnown_Tx": "E4vTvKQ3M2eXUwLujhBWJd",
           "Rx_role": "member", "Tx_role": "collection", 
-          "name": name(), "channel_type": "subscription" };
+          "name": ent:pin, "channel_type": "subscription" };
       raise wrangler event "install_rulesets_requested"
         attributes { "rid": "OpenWest2018.attendee.ui" }
     }
@@ -54,8 +55,10 @@ ruleset OpenWest2018.attendee {
     select when wrangler channel_created
     pre {
       channel = event:attr("channel");
+      pertinent = channel{"name"}=="introduction"
+                && channel{"type"}=="subscription"
     }
-    if channel{"name"}=="introduction" then noop();
+    if pertinent then noop();
     fired {
       ent:intro_channel_id := channel{"id"};
     }
@@ -104,7 +107,7 @@ ruleset OpenWest2018.attendee {
       raise wrangler event "subscription"
         attributes { "wellKnown_Tx": Tx,
           "Rx_role": "peer", "Tx_role": "peer",
-          "name": name()+"<=>"+whoami, "channel_type": "subscription" };
+          "name": ent:pin+"<=>"+whoami, "channel_type": "subscription" };
     }
   }
   rule auto_accept {
@@ -117,9 +120,26 @@ ruleset OpenWest2018.attendee {
     fired {
       raise wrangler event "pending_subscription_approval"
         attributes event:attrs;
-    } else {
-      raise wrangler event "inbound_rejection"
-        attributes { "Rx": event:attr("Rx") }    }
+    }
+  }
+  rule record_new_contact_pin {
+    select when wrangler subscription_added
+    pre {
+      subs_id = event:attr("Id");
+      subs = Subs:established("Id",subs_id)[0].klog("subs");
+      pertinent = subs{"Rx_role"}=="peer"
+               && subs{"Tx_role"}=="peer";
+      subs_Rx = subs{"Rx"}.klog("subs_Rx");
+      subs_name = engine:listChannels()
+        .filter(function(v){v{"id"}==subs_Rx}).klog("filtered")
+        [0]{"name"}.klog("subs_name");
+      peer_pin = subs_name.extract("(\d{4})<=>(\d{4})").klog("pins")
+        .filter(function(v){v!=ent:pin})[0];
+    }
+    if pertinent then noop();
+    fired {
+      ent:connections{subs_id} := peer_pin;
+    }
   }
   rule wrangler_subscription_added {
     select when wrangler subscription_added
