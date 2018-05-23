@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>OpenWest 2018</title>
+    <meta charset="UTF-8">
+<style type="text/css">
+html,body { height:100%; }
+iframe { width: 100%; height: 100%; border: none; }
+div { width: 48%; height: 100%; float: left; }
+div { border-right: 1px dashed silver; margin-right: 5px; }
+</style>
+<script type="text/javascript">
+var theURL = "http://picos.byu.edu:8080/OpenWest2018.collection/about_pin.html?pin=";
+function frameFlip(theInput,theId){
+  var theIframe = document.getElementById(theId);
+  var thePin = theInput.value;
+  theIframe.src=thePin.match(/\d{4}/) ? theURL+thePin : "";
+}
+</script>
+  </head>
+  <body>
+<div>
+<input onchange="frameFlip(this,'leftIframe')">
+<iframe id="leftIframe" src="">
+</iframe>
+</div>
+<div style="border:none">
+<input onchange="frameFlip(this,'rightIframe')">
+<iframe id="rightIframe" src="">
+</iframe>
+</div>
+  </body>
+</html>
