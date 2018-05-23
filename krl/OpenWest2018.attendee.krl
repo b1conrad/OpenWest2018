@@ -1,6 +1,5 @@
 ruleset OpenWest2018.attendee {
   meta {
-    use module io.picolabs.visual_params alias vp
     use module io.picolabs.subscription alias Subs
     use module io.picolabs.cookies alias cookies
     use module io.picolabs.wrangler alias wrangler
@@ -16,7 +15,7 @@ ruleset OpenWest2018.attendee {
                   "events": [ {"domain": "about_me", "type": "new_tag_line", "attrs": ["tag_line"]},
                               {"domain": "about_me", "type": "name_provided", "attrs": ["name"]} ] }
     tag_line = function() {
-      ent:tag_line
+      ent:tag_line.defaultsTo("")
     }
     name = function() {
       ent:name || ent:pin
@@ -38,7 +37,7 @@ ruleset OpenWest2018.attendee {
   rule intialization {
     select when wrangler ruleset_added where event:attr("rids") >< meta:rid
     fired {
-      ent:pin := vp:dname();
+      ent:pin := wrangler:myself(){"name"};
       raise wrangler event "channel_creation_requested"
         attributes { "name": "introduction", "type": "public" };
       raise visual event "config"
@@ -66,7 +65,7 @@ ruleset OpenWest2018.attendee {
     pre {
       tag_line = event:attr("tag_line");
     }
-    if tag_line then noop();
+    if not tag_line.isnull() then noop();
     fired {
       ent:tag_line := tag_line;
     }
@@ -76,7 +75,7 @@ ruleset OpenWest2018.attendee {
     pre {
       name = event:attr("name");
     }
-    if name then noop();
+    if not name.isnull() then noop();
     fired {
       ent:name := name;
     }
