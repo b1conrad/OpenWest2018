@@ -4,7 +4,7 @@ ruleset OpenWest2018.attendee {
     use module io.picolabs.subscription alias Subs
     use module io.picolabs.cookies alias cookies
     use module io.picolabs.wrangler alias wrangler
-    provides name, tag_line, intro_channel_id
+    provides name, tag_line, intro_channel_id, connections, pin
     shares __testing, tag_line, name, connections, connection_count
   }
   global {
@@ -30,6 +30,9 @@ ruleset OpenWest2018.attendee {
     }
     intro_channel_id = function() {
       ent:intro_channel_id
+    }
+    pin = function() {
+      ent:pin
     }
   }
   rule intialization {

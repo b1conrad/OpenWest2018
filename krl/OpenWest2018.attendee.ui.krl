@@ -30,6 +30,10 @@ ruleset OpenWest2018.attendee.ui {
 </html>
 >>
     }
+    li = function(array) {
+      array.map(function(v){<<<li>#{v}</li>
+>>})
+    }
     about_me = function() {
       my_name = me:name();
       intro_url = <</sky/event/#{me:intro_channel_id()}/intro/tag/scanned>>;
@@ -61,6 +65,9 @@ $(function(){
 <div style="border:1px dashed silver;padding:5px;float:left"></div>
 <br clear="all">
 <p id="postlude"></p>
+<p>pin: #{me:pin()}</p>
+<p>Connections: <ul>
+#{li(me:connections()).join("")}</ul></p>
 #{footer()}>>
     }
   }
