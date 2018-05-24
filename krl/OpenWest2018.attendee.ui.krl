@@ -45,9 +45,17 @@ ruleset OpenWest2018.attendee.ui {
       n.as("String") + suffix;
     }
     render = function(placement) {
-      (placement{"tied"} => "tied for " | "")
-      + ordinalize(placement{"place"}) + " place"
-      + " out of " + placement{"out_of"}
+      ranking = placement{"place"};
+      places = placement{"out_of"};
+      last_place = ranking >= places;
+      rank = last_place => "last"
+           | ranking==1 => "first"
+           | ranking==2 => "second"
+           | ranking==3 => "third"
+           |               ordinalize(ranking);
+      prefix = placement{"tied"} => "tied for " | "";
+      prefix + rank + " place"
+        + (places > 1 => " out of " + places | "")
     }
     about_me = function(placement) {
       progress = placement => render(placement.decode()) | "";
