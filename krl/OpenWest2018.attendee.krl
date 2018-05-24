@@ -34,6 +34,9 @@ ruleset OpenWest2018.attendee {
       ent:pin
     }
   }
+//------------------------------------------
+// when this ruleset is installed in a new owner pico
+//
   rule intialization {
     select when wrangler ruleset_added where event:attr("rids") >< meta:rid
     fired {
@@ -63,6 +66,9 @@ ruleset OpenWest2018.attendee {
       ent:intro_channel_id := channel{"id"};
     }
   }
+//------------------------------------------
+// manage updates to information about the owner pico
+//
   rule new_tag_line {
     select when about_me new_tag_line
     pre {
@@ -83,22 +89,52 @@ ruleset OpenWest2018.attendee {
       ent:name := name;
     }
   }
-  rule avoid_self_to_self {
+//------------------------------------------
+// when the tag of this owner pico is scanned
+//
+  rule identify_scanner {
     select when tag scanned
     pre {
-      whoami = cookies:cookies(){"whoami"};
+      scanner = cookies:cookies(){"whoami"};
     }
-    if whoami == ent:pin then noop();
-    fired { last }
+    fired {
+      ent:scanner_pin := scanner;
+    }
+  }
+  rule handle_unknown_scanner {
+    select when tag scanned
+    if not ent:scanner_pin.match(re#^\d{4}$#) then noop();
+    fired {
+      clear ent:scanner_pin;
+      last;
+    }
+  }
+  rule avoid_self_to_self {
+    select when tag scanned
+    if ent:scanner_pin == ent:pin then noop();
+    fired {
+      clear ent:scanner_pin;
+      last;
+    }
+  }
+  rule avoid_duplicate_connection {
+    select when tag scanned
+    pre {
+      already_connected = ent:connections.values() >< ent:scanner_pin;
+    }
+    if already_connected then noop();
+    fired {
+      clear ent:scanner_pin;
+      last;
+    }
   }
   rule tag_scanned {
     select when tag scanned
     pre {
-      whoami = cookies:cookies(){"whoami"};
       attendees_subs = Subs:established("Rx_role","member").head();
       eci = attendees_subs{"Tx"};
-      Tx = whoami && eci => wrangler:skyQuery(eci,"OpenWest2018.collection","pin_as_Rx", {"pin": whoami})
-                          | null;
+      Tx = eci => wrangler:skyQuery(eci,"OpenWest2018.collection","pin_as_Rx", {"pin": ent:scanner_pin})
+                | null;
     }
     if Tx.klog("DID") like re#^.{22}$# then every {
       send_directive("met",{"name":name(),"about me":ent:tag_line, "peer":whoami, "peer_Tx": Tx});
@@ -109,7 +145,13 @@ ruleset OpenWest2018.attendee {
           "Rx_role": "peer", "Tx_role": "peer",
           "name": ent:pin+"<=>"+whoami, "channel_type": "subscription" };
     }
+    finally {
+      clear ent:scanner_pin;
+    }
   }
+//------------------------------------------
+// subscription management
+//
   rule auto_accept {
     select when wrangler inbound_pending_subscription_added
     pre {
