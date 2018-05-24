@@ -2,12 +2,14 @@ ruleset OpenWest2018.collection {
   meta {
     use module io.picolabs.collection alias my
     use module io.picolabs.wrangler alias Wrangler
-    shares __testing, my_members, high_scores, pin_as_Rx, about_pin
+    provides high_scores
+    shares __testing, my_members, high_scores, pin_as_Rx, about_pin, place
   }
   global {
     __testing = { "queries": [ { "name": "__testing" },
                                { "name": "my_members" },
-                               { "name": "high_scores" } ],
+                               { "name": "high_scores" },
+                               { "name": "place", "args": [ "pin" ] } ],
                   "events": [{"domain":"attendees", "type": "need_sync"}] }
     my_members = function(){
       my:members()
@@ -32,6 +34,9 @@ ruleset OpenWest2018.collection {
       Tx = pin_as_Rx(pin);
       html = Wrangler:skyQuery(Tx, "OpenWest2018.attendee.ui", "about_me");
       html{"error"} => html{"skyQueryError"} | html
+    }
+    place = function(pin) { // returns placement and whether tied
+      [ 1, false ]
     }
   }
   rule new_member {
