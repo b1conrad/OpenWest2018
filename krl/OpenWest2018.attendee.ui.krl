@@ -13,7 +13,13 @@ ruleset OpenWest2018.attendee.ui {
       //, { "domain": "d2", "type": "t2", "attrs": [ "a1", "a2" ] }
       ]
     }
+//---------- hard-coded personal cloud server -----------------------
+//
     pc_host = "http://picos.byu.edu:8080"
+
+//--------- standard HTML header ------------------------------------
+//title and optional scripts
+//
     header = function(title,scripts) {
       <<<!DOCTYPE HTML>
 <html>
@@ -25,15 +31,20 @@ ruleset OpenWest2018.attendee.ui {
   <body>
 >>
     }
+//--------- standard HTML footer ------------------------------------
+//
     footer = function() {
       <<  </body>
 </html>
 >>
     }
+//----- generate HTML for an array of list items --------------------
     li = function(array) {
       array.map(function(v){<<<li>#{v}</li>
->>})
+>>}).join("")
     }
+//------------- ordinal string in English for a positive integer-----
+//
     ordinalize = function(n) {
       unit = n % 10;
       teen = 10 <= n && n < 20;
@@ -44,6 +55,10 @@ ruleset OpenWest2018.attendee.ui {
              |              "th";
       n.as("String") + suffix;
     }
+//--------- compute placement string -------------------------------
+// render  ::= ["tied for "] ordinal " place" [" out of " TOTAL ]
+// ordinal ::= "first" | "second" | "third" | "4th" | ... | "42nd" | ... | "last"
+//
     render = function(placement) {
       ranking = placement{"place"};
       places = placement{"out_of"};
@@ -57,6 +72,8 @@ ruleset OpenWest2018.attendee.ui {
       prefix + rank + " place"
         + (places > 1 => " out of " + places | "")
     }
+//----------- generate HTML for the about me page ------------------
+//
     about_me = function(placement) {
       progress = placement => render(placement.decode()) | "";
       my_name = me:name();
@@ -91,7 +108,7 @@ $(function(){
 <p id="postlude"></p>
 <p>pin: #{me:pin()} #{progress}</p>
 <p>Connections: <ul>
-#{li(me:connections()).join("")}</ul></p>
+#{li(me:connections())}</ul></p>
 #{footer()}>>
     }
   }
