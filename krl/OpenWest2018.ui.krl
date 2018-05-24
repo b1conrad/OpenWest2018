@@ -29,11 +29,13 @@ ruleset OpenWest2018.ui {
 </html>
 >>
     }
+    page_url = function(pin) {
+      <<#{pc_host}/OpenWest2018.collection/about_pin.html?pin=#{pin}>>
+    }
     html = function(id,pin) {
-      page_url = <<#{pc_host}/OpenWest2018.collection/about_pin.html?pin=#{pin}>>;
       <<#{header(pin,scripts)}<pre>id=#{id}</pre>
 <h1>#{pin}</h1>
-<h2><a href="#{page_url}">my page</a></h2>
+<h2><a href="#{page_url(pin)}">my page</a></h2>
 #{footer()}>>
     }
   }
@@ -57,7 +59,9 @@ ruleset OpenWest2018.ui {
       id = event:attr("id");
       pin = ids:as_pin(id);
       scanned_by = event:attr("scanned_by");
-      html = <<#{header(pin)}<h1>Welcome #{scanned_by}</h1>#{footer()}>>;
+      html = <<#{header(pin)}<h1>Welcome #{scanned_by}</h1>
+<h2><a href="#{page_url(pin)}">my page</a></h2>
+#{footer()}>>;
     }
     send_directive("_html",{"content":html});
   }
