@@ -46,7 +46,7 @@ ruleset OpenWest2018.collection {
         .reduce(function(a,v){
           which = highs{pins[v]};
           which >< pin => placement(which,v) | a
-        },null)
+        },placement([pin],0))
     }
   }
   rule new_member {
