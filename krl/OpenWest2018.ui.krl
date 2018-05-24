@@ -30,32 +30,10 @@ ruleset OpenWest2018.ui {
 >>
     }
     html = function(id,pin) {
-      scripts = <<<script src="#{pc_host}/js/jquery-3.1.0.min.js"></script>
-<!-- thanks to Jerome Etienne http://jeromeetienne.github.io/jquery-qrcode/ -->
-<script type="text/javascript" src="#{pc_host}/js/jquery.qrcode.js"></script>
-<script type="text/javascript" src="#{pc_host}/js/qrcode.js"></script>
-<script type="text/javascript">
-$(function(){
-      var url = "#{pc_host}/qr/tag/scanned?id=#{id}";
-      $("p#prelude").empty().append($("<a>",{href:url,text:url}));
-      $("div").qrcode(url);
-      var canvas = $("div canvas").get(0);
-      var context = canvas.getContext("2d");
-      var logo = new Image();
-      logo.src = "#{pc_host}/pico-logo-48x48.png";
-      logo.onload = function(){
-        context.drawImage(logo,104,104);
-      }
-      var pngUrl = canvas.toDataURL();
-      $("p#postlude").append($("<a>",{href:pngUrl,text:"image link"}));
-});
-</script>
->>;
+      page_url = <<#{pc_host}/OpenWest2018.collection/about_pin.html?pin=#{pin}>>;
       <<#{header(pin,scripts)}<pre>id=#{id}</pre>
-<p id="prelude"></p>
-<div style="border:1px dashed silver;padding:5px;float:left"></div>
-<br clear="all">
-<p id="postlude"></p>
+<h1>#{pin}</h1>
+<h2><a href="#{page_url}">my page</a></h2>
 #{footer()}>>
     }
   }
