@@ -34,7 +34,23 @@ ruleset OpenWest2018.attendee.ui {
       array.map(function(v){<<<li>#{v}</li>
 >>})
     }
-    about_me = function() {
+    ordinalize = function(n) {
+      unit = n % 10;
+      teen = 10 <= n && n < 20;
+      suffix = teen      => "th"
+             | unit == 1 => "st"
+             | unit == 2 => "nd"
+             | unit == 3 => "rd"
+             |              "th";
+      n.as("String") + suffix;
+    }
+    render = function(placement) {
+      (placement{"tied"} => "tied for " | "")
+      + ordinalize(placement{"place"}) + " place"
+      + " out of " + placement{"out_of"}
+    }
+    about_me = function(placement) {
+      progress = placement => render(placement.decode()) | "";
       my_name = me:name();
       intro_url = <</sky/event/#{me:intro_channel_id()}/intro/tag/scanned>>;
       scripts = <<<script src="#{pc_host}/js/jquery-3.1.0.min.js"></script>
@@ -65,7 +81,7 @@ $(function(){
 <div style="border:1px dashed silver;padding:5px;float:left"></div>
 <br clear="all">
 <p id="postlude"></p>
-<p>pin: #{me:pin()}</p>
+<p>pin: #{me:pin()} #{progress}</p>
 <p>Connections: <ul>
 #{li(me:connections()).join("")}</ul></p>
 #{footer()}>>

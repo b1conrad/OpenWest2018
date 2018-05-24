@@ -32,11 +32,21 @@ ruleset OpenWest2018.collection {
     }
     about_pin = function(pin) {
       Tx = pin_as_Rx(pin);
-      html = Wrangler:skyQuery(Tx, "OpenWest2018.attendee.ui", "about_me");
+      html = Wrangler:skyQuery(Tx, "OpenWest2018.attendee.ui", "about_me",
+        {"placement": place(pin).encode()});
       html{"error"} => html{"skyQueryError"} | html
     }
-    place = function(pin) { // returns placement and whether tied
-      [ 1, false ]
+    place = function(pin) { // returns place and whether tied
+      highs = high_scores();
+      pins = highs.keys();
+      placement = function(v,k) {
+        { "place": k+1, "tied": v.length()>1, "out_of": pins.length()}
+      };
+      0.range(pins.length()-1)
+        .reduce(function(a,v){
+          which = highs{pins[v]};
+          which >< pin => placement(which,v) | a
+        },null)
     }
   }
   rule new_member {
