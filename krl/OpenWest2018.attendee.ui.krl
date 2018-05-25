@@ -112,4 +112,11 @@ $(function(){
 #{footer()}>>
     }
   }
+  rule recruit_booth_visitor {
+    select when attendee unknown_scanner
+    send_directive("_html",{"content":<<#{header("Pico Labs booth")}<p>
+Please visit the Pico Labs booth to participate
+</p>
+#{footer()}>>})
+  }
 }

@@ -105,6 +105,7 @@ ruleset OpenWest2018.attendee {
     select when tag scanned
     if not ent:scanner_pin.match(re#^\d{4}$#) then noop();
     fired {
+      raise attendee event "unknown_scanner";
       clear ent:scanner_pin;
       last;
     }
