@@ -32,6 +32,7 @@ $(function(){
       }
       var pngUrl = canvas.toDataURL();
       $("p#postlude").append($("<a>",{href:pngUrl,text:"image link"}));
+      setTimeout(function(){window.history.back()},5000);
     } else {
       problem(data);
     }
