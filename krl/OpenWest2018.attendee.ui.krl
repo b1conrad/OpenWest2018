@@ -75,6 +75,7 @@ ruleset OpenWest2018.attendee.ui {
 //----------- generate HTML for the about me page ------------------
 //
     about_me = function(placement) {
+      connections = me:connections();
       progress = placement => render(placement.decode()) | "";
       my_name = me:name();
       intro_url = <</sky/event/#{me:intro_channel_id()}/intro/tag/scanned>>;
@@ -85,8 +86,8 @@ ruleset OpenWest2018.attendee.ui {
 <script type="text/javascript">
 $(function(){
       var url = "#{pc_host + intro_url}";
-      $("p#prelude").empty().append($("<a>",{href:url,text:url}));
       $("div").qrcode(url);
+      $("div").click(function(){location=url});
       var canvas = $("div canvas").get(0);
       var context = canvas.getContext("2d");
       var logo = new Image();
@@ -95,20 +96,17 @@ $(function(){
         context.drawImage(logo,104,104);
       }
       var pngUrl = canvas.toDataURL();
-      $("p#postlude").append($("<a>",{href:pngUrl,text:"image link"}));
 });
 </script>
 >>;
       <<#{header(my_name,scripts)}
     <h1>#{my_name}</h1>
     <h2>#{me:tag_line()}</h2>
-<p id="prelude"></p>
-<div style="border:1px dashed silver;padding:5px;float:left"></div>
+<div style="border:1px dashed silver;padding:5px;float:left;cursor:pointer"></div>
 <br clear="all">
-<p id="postlude"></p>
 <p>pin: #{me:pin()} #{progress}</p>
-<p>Connections: <ul>
-#{li(me:connections())}</ul></p>
+<p>Connections (#{connections.length()}): <ul>
+#{li(connections)}</ul></p>
 #{footer()}>>
     }
   }
@@ -117,6 +115,6 @@ $(function(){
     send_directive("_html",{"content":<<#{header("Pico Labs booth")}<p>
 Please visit the Pico Labs booth to participate
 </p>
-#{footer()}>>})
+#{footer()}>>});
   }
 }
