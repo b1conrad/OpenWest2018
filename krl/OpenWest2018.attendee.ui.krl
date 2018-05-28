@@ -109,12 +109,41 @@ $(function(){
 #{li(connections)}</ul></p>
 #{footer()}>>
     }
+    my_page_link = function(pin) {
+      url = <<#{pc_host}/OpenWest2018.collection/about_pin.html?pin=#{pin}>>;
+      <<<a href="#{url}">my page</a>
+>>
+    }
   }
   rule recruit_booth_visitor {
     select when attendee unknown_scanner
     send_directive("_html",{"content":<<#{header("Pico Labs booth")}<p>
 Please visit the Pico Labs booth to participate
 </p>
+#{footer()}>>});
+  }
+  rule notify_attempt_to_connect_to_self {
+    select when attendee scan_self
+    send_directive("_html",{"content":<<#{header("Cannot connect to self")}<p>
+Cannot make a connection with yourself
+</p>
+#{my_page_link(event:attr("scanner_pin"))}
+#{footer()}>>});
+  }
+  rule notify_attempted_duplicate {
+    select when attendee already_connected
+    send_directive("_html",{"content":<<#{header("Already connected")}<p>
+You are already connected to #{event:attr("designation")}
+</p>
+#{my_page_link(event:attr("scanner_pin"))}
+#{footer()}>>});
+  }
+  rule notify_connection {
+    select when attendee connected
+    send_directive("_html",{"content":<<#{header("Connected")}<p>
+You are now connected to #{event:attr("designation")}
+</p>
+#{my_page_link(event:attr("scanner_pin"))}
 #{footer()}>>});
   }
 }

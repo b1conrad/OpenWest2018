@@ -118,6 +118,8 @@ ruleset OpenWest2018.attendee {
     select when tag scanned
     if ent:scanner_pin == ent:pin then noop();
     fired {
+      raise attendee event "scan_self"
+        attributes {"scanner_pin":ent:scanner_pin};
       clear ent:scanner_pin;
       last;
     }
@@ -129,6 +131,8 @@ ruleset OpenWest2018.attendee {
     }
     if already_connected then noop();
     fired {
+      raise attendee event "already_connected"
+        attributes {"scanner_pin":ent:scanner_pin, "designation":designation()};
       clear ent:scanner_pin;
       last;
     }
@@ -146,6 +150,8 @@ ruleset OpenWest2018.attendee {
         {"name":name(),"about me":ent:tag_line, "peer":ent:scanner_pin, "peer_Tx": Tx});
     }
     fired {
+      raise attendee event "connected"
+        attributes {"scanner_pin":ent:scanner_pin, "designation":designation()};
       raise wrangler event "subscription"
         attributes { "wellKnown_Tx": Tx,
           "Rx_role": "peer", "Tx_role": "peer",
