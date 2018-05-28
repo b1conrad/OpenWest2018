@@ -83,4 +83,17 @@ ruleset OpenWest2018.tags {
       clear ent:scanned_by;
     }
   }
+  rule tag_initials_provided {
+    select when tag initials_provided pin re#^(\d{4})# setting(pin)
+    pre {
+      whoami = cookies:cookies(){"whoami"};
+      initials = event:attr("name") || pin;
+      tag_line = event:attr("tag_line") || "one_liner about "+pin;
+      eci = wrangler:children().head(){"eci"};
+    }
+    if pin==whoami then
+      event:send({"eci":eci, "domain": "attendees", "type": "initials_provided",
+        "attrs": {"pin": pin, "initials": initials, "tag_line": tag_line}
+      });
+  }
 }

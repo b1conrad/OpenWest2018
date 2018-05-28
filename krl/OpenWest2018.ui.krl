@@ -33,9 +33,16 @@ ruleset OpenWest2018.ui {
       <<#{pc_host}/OpenWest2018.collection/about_pin.html?pin=#{pin}>>
     }
     html = function(id,pin) {
+      form_url = <<#{pc_host}/qr/tag/initials_provided>>;
       <<#{header(pin,scripts)}<pre>id=#{id}</pre>
 <h1>#{pin}</h1>
-<h2><a href="#{page_url(pin)}">my page</a></h2>
+<form action="#{form_url}">
+<input type="hidden" name="pin" value="#{pin}">
+<input name="name" placeholder="initials">
+<br>
+<input name="tag_line" placeholder="one-liner about me">
+<input type="submit">
+</form>
 #{footer()}>>
     }
   }
@@ -61,6 +68,17 @@ ruleset OpenWest2018.ui {
       scanned_by = event:attr("scanned_by");
       html = <<#{header(pin)}<h1>Welcome #{scanned_by}</h1>
 <h2><a href="#{page_url(pin)}">my page</a></h2>
+#{footer()}>>;
+    }
+    send_directive("_html",{"content":html});
+  }
+  rule tag_initials_provided {
+    select when tag initials_provided
+    pre {
+      pin = event:attr("pin");
+      name = event:attr("name") || pin;
+      html = <<#{header(name)}<h1>Welcome #{name}</h1>
+<h2><a href="#{page_url(pin)}">my page</a>!</h2>
 #{footer()}>>;
     }
     send_directive("_html",{"content":html});

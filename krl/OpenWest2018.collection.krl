@@ -84,4 +84,21 @@ ruleset OpenWest2018.collection {
       ent:scores{key} := connection_count;
     }
   }
+  rule inform_attendee_of_initials {
+    select when attendees initials_provided
+    pre {
+      pin = event:attr("pin");
+      initials = event:attr("initials");
+      tag_line = event:attr("tag_line");
+      eci = pin_as_Rx(pin);
+    }
+    if eci then every {
+      event:send({"eci": eci, "domain": "about_me", "type": "name_provided",
+        "attrs": {"name": initials}
+      });
+      event:send({"eci": eci, "domain": "about_me", "type": "new_tag_line",
+        "attrs": {"tag_line": tag_line}
+      });
+    }
+  }
 }
