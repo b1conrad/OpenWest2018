@@ -31,7 +31,7 @@ ruleset OpenWest2018.collection.ui {
 >>
     }
     scores_dd = function(v){
-      <<        <dd>#{all:attendee_name(v)}</dd>
+      <<        <dd>#{all:attendee_designation(v)}</dd>
 >>
     }
     scores_dt = function(scores_map) {

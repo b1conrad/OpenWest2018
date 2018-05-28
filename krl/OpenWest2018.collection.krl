@@ -2,7 +2,7 @@ ruleset OpenWest2018.collection {
   meta {
     use module io.picolabs.collection alias my
     use module io.picolabs.wrangler alias Wrangler
-    provides high_scores, attendee_name
+    provides high_scores, attendee_designation
     shares __testing, my_members, high_scores, pin_as_Rx, about_pin, place
   }
   global {
@@ -14,10 +14,10 @@ ruleset OpenWest2018.collection {
     my_members = function(){
       my:members()
     }
-    attendee_name = function(pin) {
+    attendee_designation = function(pin) {
       key = pin_as_Rx(pin);
-      name = Wrangler:skyQuery(key, "OpenWest2018.attendee", "name");
-      name{"error"} => pin | name
+      designation = Wrangler:skyQuery(key, "OpenWest2018.attendee", "designation");
+      designation{"error"} => pin | designation
     }
     high_scores = function() {
       ent:scores.keys()
