@@ -17,7 +17,7 @@ ruleset OpenWest2018.collection {
     attendee_name = function(pin) {
       key = pin_as_Rx(pin);
       name = Wrangler:skyQuery(key, "OpenWest2018.attendee", "name");
-      name{"error"} => ent:attendees{key} | name
+      name{"error"} => pin | name
     }
     high_scores = function() {
       ent:scores.keys()
