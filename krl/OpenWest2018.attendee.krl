@@ -23,7 +23,7 @@ ruleset OpenWest2018.attendee {
     }
     connections = function() {
       Subs:established("Rx_role","peer")
-        .map(function(v){wrangler:skyQuery(v{"Tx"},meta:rid,"name")})
+        .map(function(v){wrangler:skyQuery(v{"Tx"},meta:rid,"designation")})
     }
     connection_count = function() {
       Subs:established("Rx_role","peer").length();
@@ -102,7 +102,7 @@ ruleset OpenWest2018.attendee {
       scanner = cookies:cookies(){"whoami"};
     }
     fired {
-      ent:scanner_pin := scanner;
+      ent:scanner_pin := scanner.klog("scanner pin");
     }
   }
   rule handle_unknown_scanner {
@@ -142,13 +142,14 @@ ruleset OpenWest2018.attendee {
                 | null;
     }
     if Tx.klog("DID") like re#^.{22}$# then every {
-      send_directive("met",{"name":name(),"about me":ent:tag_line, "peer":whoami, "peer_Tx": Tx});
+      send_directive("met",
+        {"name":name(),"about me":ent:tag_line, "peer":ent:scanner_pin, "peer_Tx": Tx});
     }
     fired {
       raise wrangler event "subscription"
         attributes { "wellKnown_Tx": Tx,
           "Rx_role": "peer", "Tx_role": "peer",
-          "name": ent:pin+"<=>"+whoami, "channel_type": "subscription" };
+          "name": ent:pin+"<=>"+ent:scanner_pin, "channel_type": "subscription" };
     }
     finally {
       clear ent:scanner_pin;
