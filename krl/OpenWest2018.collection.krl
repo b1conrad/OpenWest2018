@@ -38,15 +38,14 @@ ruleset OpenWest2018.collection {
     }
     place = function(pin) { // returns place and whether tied
       highs = high_scores();
-      pins = highs.keys();
+      places = highs.keys();
+      places_len = places.length();
       placement = function(v,k) {
-        { "place": k+1, "tied": v.length()>1, "out_of": pins.length()}
+        { "place": k+1, "tied": v.length()>1, "out_of": places_len}
       };
-      0.range(pins.length()-1)
-        .reduce(function(a,v){
-          which = highs{pins[v]};
-          which >< pin => placement(which,v) | a
-        },placement([pin],0))
+      places.reduce(function(a,v,k){
+        highs{v} >< pin => placement(highs{v},k) | a
+      },placement(highs{"count=0"},places_len-1))
     }
   }
   rule new_member {
