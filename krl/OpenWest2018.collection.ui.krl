@@ -40,9 +40,12 @@ ruleset OpenWest2018.collection.ui {
           <<      <dt>#{k.replace("count=","")}</dt>
 #{v.map(scores_dd).join("")}>>}).values()
     }
+    show_top = 3;
     high_scores_page = function() {
       all_scores = all:high_scores();
-      high_score_keys = all_scores.keys().slice(2);
+      need_slice = all_scores.length() >= show_top;
+      high_score_keys = need_slice => all_scores.keys().slice(show_top-1)
+                                    | all_scores.keys();
       high_scores = all_scores
         .filter(function(v,k){high_score_keys >< k});
       <<#{header("High Scores")}    <h1>High Scores</h1>
