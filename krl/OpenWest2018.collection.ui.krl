@@ -31,7 +31,7 @@ ruleset OpenWest2018.collection.ui {
 >>
     }
     scores_dd = function(v){
-      <<        <dd>#{v}</dd>
+      <<        <dd>#{all:attendee_name(v)}</dd>
 >>
     }
     scores_dt = function(scores_map) {
@@ -41,9 +41,13 @@ ruleset OpenWest2018.collection.ui {
 #{v.map(scores_dd).join("")}>>}).values()
     }
     high_scores_page = function() {
+      all_scores = all:high_scores();
+      high_score_keys = all_scores.keys().slice(2);
+      high_scores = all_scores
+        .filter(function(v,k){high_score_keys >< k});
       <<#{header("High Scores")}    <h1>High Scores</h1>
     <dl>
-#{scores_dt(all:high_scores()).join("")}
+#{scores_dt(high_scores).join("")}
     </dl>
 #{footer()}>>
     }
