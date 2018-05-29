@@ -99,6 +99,9 @@ ruleset OpenWest2018.collection {
       event:send({"eci": eci, "domain": "about_me", "type": "new_tag_line",
         "attrs": {"tag_line": tag_line}
       });
+      event:send({"eci": eci, "domain": "about_me", "type": "sign_up_complete",
+        "attrs": event:attrs
+      });
     }
   }
 }

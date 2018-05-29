@@ -90,10 +90,12 @@ ruleset OpenWest2018.tags {
       initials = event:attr("name") || pin;
       tag_line = event:attr("tag_line") || "one_liner about "+pin;
       eci = wrangler:children().head(){"eci"};
+      pass_along_attrs = event:attrs
+        .put({"initials": initials, "tag_line": tag_line});
     }
     if pin==whoami then
       event:send({"eci":eci, "domain": "attendees", "type": "initials_provided",
-        "attrs": {"pin": pin, "initials": initials, "tag_line": tag_line}
+        "attrs": pass_along_attrs
       });
   }
 }

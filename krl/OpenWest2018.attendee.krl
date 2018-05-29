@@ -37,6 +37,11 @@ ruleset OpenWest2018.attendee {
     designation = function() {
       name() + (ent:tag_line => ": " + ent:tag_line | "")
     }
+    pending_connections = function() {
+      c_connections = cookies:cookies(){"connections"};
+      c_connections => c_connections.split(re#_#)
+                     | []
+    }
   }
 //------------------------------------------
 // when this ruleset is installed in a new owner pico
@@ -92,6 +97,14 @@ ruleset OpenWest2018.attendee {
     fired {
       ent:name := name;
     }
+  }
+  rule handle_pending_connections {
+    select when about_me sign_up_complete
+    foreach pending_connections() setting(Tx)
+    event:send({"eci":Tx, "eid": "intro",
+      "domain": "tag", "type": "scanned",
+      "attrs": event:attrs
+    })
   }
 //------------------------------------------
 // when the tag of this owner pico is scanned
