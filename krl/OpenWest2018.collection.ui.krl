@@ -31,7 +31,8 @@ ruleset OpenWest2018.collection.ui {
 >>
     }
     scores_dd = function(v){
-      <<        <dd>#{all:attendee_designation(v)}</dd>
+      label = all:attendee_designation(v);
+      <<        <dd>#{label==v => v | "["+v+"] "+label}</dd>
 >>
     }
     scores_dt = function(scores_map) {
@@ -40,7 +41,7 @@ ruleset OpenWest2018.collection.ui {
           <<      <dt>#{k.replace("count=","")}</dt>
 #{v.map(scores_dd).join("")}>>}).values()
     }
-    show_top = 3;
+    show_top = 5;
     high_scores_page = function() {
       all_scores = all:high_scores();
       need_slice = all_scores.length() >= show_top;
