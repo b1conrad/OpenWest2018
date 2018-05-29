@@ -107,9 +107,18 @@ ruleset OpenWest2018.attendee {
   }
   rule handle_unknown_scanner {
     select when tag scanned
-    if not ent:scanner_pin.match(re#^\d{4}$#) then noop();
+    pre {
+      c_connections = cookies:cookies(){"connections"}.defaultsTo("");
+      o_connections = c_connections => c_connections.split(re#_#)
+                                     | [];
+      connections = o_connections.append([meta:eci]).unique();
+    }
+    if not ent:scanner_pin.match(re#^\d{4}$#) then
+      send_directive("_cookie",
+        {"cookie":<<connections=#{connections.join("_")}; Path=/>>});
     fired {
-      raise attendee event "unknown_scanner";
+      raise attendee event "unknown_scanner"
+        attributes {"connections_count": connections.length()};
       clear ent:scanner_pin;
       last;
     }

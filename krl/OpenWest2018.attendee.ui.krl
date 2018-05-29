@@ -117,12 +117,15 @@ $(function(){
   }
   rule recruit_booth_visitor {
     select when attendee unknown_scanner
+    pre {
+      connections_count = event:attr("connections_count");
+      connection_s = connections_count == 1 => "connection" | "connections";
+    }
     send_directive("_html",{"content":<<#{header("Connection Collection")}
   <h1>Connection Collection</h1>
   <h2>Most connections wins a daily prize!</h2>
-  <p>
-Please visit the Pico Labs booth to participate
-</p>
+  <p>Please visit the Pico Labs booth to participate</p>
+  <p>You have #{connections_count} pending #{connection_s}</p>
 Sponsored by <a href="http://picolabs.io/">Pico Labs</a>
 #{footer()}>>});
   }
