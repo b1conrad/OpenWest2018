@@ -117,9 +117,13 @@ $(function(){
   }
   rule recruit_booth_visitor {
     select when attendee unknown_scanner
-    send_directive("_html",{"content":<<#{header("Pico Labs booth")}<p>
+    send_directive("_html",{"content":<<#{header("Connection Collection")}
+  <h1>Connection Collection</h1>
+  <h2>Most connections wins a daily prize!</h2>
+  <p>
 Please visit the Pico Labs booth to participate
 </p>
+Sponsored by <a href="http://picolabs.io/">Pico Labs</a>
 #{footer()}>>});
   }
   rule notify_attempt_to_connect_to_self {
