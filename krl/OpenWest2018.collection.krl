@@ -77,11 +77,22 @@ ruleset OpenWest2018.collection {
     select when attendee new_connection
     pre {
       id = event:attr("id");
-      connection_count = event:attr("connection_count");
-      key = my_members().filter(function(v){v{"Id"}==id}).head(){"Tx"};
+      connection_count = event:attr("connection_count").klog("connection_count");
+      subs = my_members().filter(function(v){v{"Id"}==id}).head();
+      key = subs{"Tx"};
+      verified_message = engine:verifySignedMessage(
+          subs{"Tx_verify_key"}, event:attr("signed_message")
+        ).klog("signed_message");
+      verified_count = verified_message.decode();
     }
+    if verified_count{"count"} == connection_count then noop();
     fired {
       ent:scores{key} := connection_count;
+      raise attendees event "scores_changed" attributes event:attrs;
+    } else {
+      raise attendees event "under_attack" attributes event:attrs.put({
+        "verified_count": verified_count, "connection_count": connection_count
+      });
     }
   }
   rule inform_attendee_of_initials {

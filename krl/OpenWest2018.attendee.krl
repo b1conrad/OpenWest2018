@@ -223,10 +223,19 @@ ruleset OpenWest2018.attendee {
       attendees_subs = Subs:established("Rx_role","member")[0];
       attendees_eci = attendees_subs{"Tx"};
       attendees_id = attendees_subs{"Id"};
+      count = connection_count();
+      message = { "connection_count": count }.encode().klog("message");
+      my_eci = attendees_subs{"Rx"};
+      signed_message = engine:signChannelMessage(my_eci,message);
     }
     if attendees_eci && attendees_id then
       event:send({"eci":attendees_eci,
         "domain": "attendee", "type": "new_connection",
-        "attrs": {"id":attendees_id,"connection_count":connection_count()}});
+        "attrs": {
+          "id": attendees_id,
+          "connection_count": count,
+          "signed_message": signed_message.klog("signed_message")
+        }
+      });
   }
 }
