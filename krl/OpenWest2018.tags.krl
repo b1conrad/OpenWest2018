@@ -3,13 +3,27 @@ ruleset OpenWest2018.tags {
     use module OpenWest2018.keys alias ids
     use module io.picolabs.wrangler alias wrangler
     use module io.picolabs.cookies alias cookies
-    shares __testing
+    shares __testing, timestamps
   }
   global {
-    __testing = { "queries": [ { "name": "__testing" } ],
-                  "events": [ ] }
+    __testing = { "queries":
+      [ { "name": "__testing" }
+      , { "name": "timestamps" }
+      //, { "name": "entry", "args": [ "key" ] }
+      ] , "events":
+      [ //{ "domain": "d1", "type": "t1" }
+      //, { "domain": "d2", "type": "t2", "attrs": [ "a1", "a2" ] }
+      ]
+    }
     child_specs = {
       "rids": ["io.picolabs.subscription","OpenWest2018.attendee"] };
+    MDT = function(ts) {time:add(ts,{"hours": -6})}
+    timestamps = function() {
+      ent:owners
+        .keys()
+        .sort(function(a,b){ent:owners{a} cmp ent:owners{b}})
+        .reduce(function(a,k){a.put(MDT(ent:owners{k}),k)},{})
+    }
   }
   rule initialization {
     select when wrangler ruleset_added where event:attr("rids") >< meta:rid
@@ -52,13 +66,11 @@ ruleset OpenWest2018.tags {
   rule scanner_unknown {
     select when tag scanned id re#^(\d{15})$# setting(id)
     pre {
-      key = id;
       whoami = cookies:cookies(){"whoami"};
     }
     if whoami.isnull()
       then send_directive("unknown scanner",{"id": id,"page":"recovery"});
     fired {
-      ent:owners{key} := time:now();
       raise tag event "recovery_needed" attributes event:attrs;
       last;
     } else {
@@ -76,7 +88,6 @@ ruleset OpenWest2018.tags {
           "scanned_by": ent:scanned_by
         });
     fired {
-      ent:owners{key} := time:now();
       raise tag event "subsequent_scan"
         attributes event:attrs.put("scanned_by", ent:scanned_by);
     } finally {
@@ -97,5 +108,21 @@ ruleset OpenWest2018.tags {
       event:send({"eci":eci, "domain": "attendees", "type": "initials_provided",
         "attrs": pass_along_attrs
       });
+  }
+  rule tag_recovery_codes_provided {
+    select when tag recovery_codes_provided id re#^(\d{15})$# setting(id)
+    pre {
+      date = event:attr("date");
+      time = event:attr("time");
+      millis = event:attr("millis");
+      ts = time:add(<<#{date}T#{time}.#{millis}Z>>,{"hours":6});
+    }
+    if ent:owners{id} == ts then
+      send_directive("recovery_codes_accepted");
+    fired {
+      raise tag event "recovery_codes_accepted" attributes {
+        "txnId": meta:txnId, "id": id
+      };
+    }
   }
 }

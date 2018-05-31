@@ -59,6 +59,22 @@ ruleset OpenWest2018.ui {
   }
   rule tag_recovery_needed {
     select when tag recovery_needed
+    pre {
+      id = event:attr("id");
+      form_url = <<#{pc_host}/qr/tag/recovery_codes_provided>>;
+      html = <<#{header("Connections recovery")}<h1>Connections recovery</h1>
+<p>Please enter codes to recover your connections</p>
+<form action="#{form_url}">
+<input type="hidden" name="id" value="#{id}">
+<input name="date" placeholder="code part one">
+<input name="time" placeholder="code part two">
+<input name="millis" placeholder="code part three">
+<br>
+<input type="submit">
+</form>
+#{footer()}>>
+    }
+    send_directive("_html",{"content":html})
   }
   rule tag_subsequent_scan {
     select when tag subsequent_scan
@@ -82,5 +98,19 @@ ruleset OpenWest2018.ui {
 #{footer()}>>;
     }
     send_directive("_html",{"content":html});
+  }
+  rule tag_recovery_codes_accepted {
+    select when tag recovery_codes_accepted
+    pre {
+      ok = event:attr("txnId") == meta:txnId;
+      pin = ids:as_pin(event:attr("id"));
+      html = <<#{header("Connections recovered")}<h1>Connections recovered</h1>
+<h2><a href="#{page_url(pin)}">my page</a></h2>
+#{footer()}>>;
+    }
+    if ok then every {
+      send_directive("_cookie",{"cookie":<<whoami=#{pin}; Path=/>>});
+      send_directive("_html",{"content":html});
+    }
   }
 }
