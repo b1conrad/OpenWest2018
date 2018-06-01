@@ -79,6 +79,9 @@ ruleset OpenWest2018.attendee.ui {
       progress = placement => render(placement.decode()) | "";
       my_name = me:name();
       intro_url = <</sky/event/#{me:intro_channel_id()}/intro/tag/scanned>>;
+      export_url = <</sky/event/#{me:intro_channel_id()}/export/export/json>>;
+      export_button = export_avail() => <<<button id="export" style="float:right">export</button>
+>> | "";
       scripts = <<<script src="#{pc_host}/js/jquery-3.1.0.min.js"></script>
 <!-- thanks to Jerome Etienne http://jeromeetienne.github.io/jquery-qrcode/ -->
 <script type="text/javascript" src="#{pc_host}/js/jquery.qrcode.js"></script>
@@ -95,11 +98,12 @@ $(function(){
       logo.onload = function(){
         context.drawImage(logo,104,104);
       }
+      var export_url = "#{pc_host + export_url}";
+      $("#export").click(function(){location=export_url});
 });
 </script>
 >>;
-      <<#{header(my_name,scripts)}
-    <button style="float:right">export</button>
+      <<#{header(my_name,scripts)}#{export_button}
     <h1>#{my_name}</h1>
     <h2>#{me:tag_line()}</h2>
 <div style="border:1px dashed silver;padding:5px;float:left;cursor:pointer"></div>
@@ -116,6 +120,10 @@ Connections (#{connections.length()}):
       url = <<#{pc_host}/OpenWest2018.collection/about_pin.html?pin=#{pin}>>;
       <<<a href="#{url}">my page</a>
 >>
+    }
+
+    export_avail = function() {
+      engine:listInstalledRIDs() >< "OpenWest2018.export"
     }
   }
   rule recruit_booth_visitor {
