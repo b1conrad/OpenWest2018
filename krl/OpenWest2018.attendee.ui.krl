@@ -95,7 +95,6 @@ $(function(){
       logo.onload = function(){
         context.drawImage(logo,104,104);
       }
-      var pngUrl = canvas.toDataURL();
 });
 </script>
 >>;
@@ -105,8 +104,11 @@ $(function(){
 <div style="border:1px dashed silver;padding:5px;float:left;cursor:pointer"></div>
 <br clear="all">
 <p>pin: #{me:pin()} #{progress}</p>
-<p>Connections (#{connections.length()}): <ul>
-#{li(connections)}</ul></p>
+<p>
+Connections (#{connections.length()}):
+<ul>
+#{li(connections)}</ul>
+</p>
 #{footer()}>>
     }
     my_page_link = function(pin) {
