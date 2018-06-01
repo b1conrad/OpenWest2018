@@ -40,7 +40,7 @@ ruleset OpenWest2018.attendee.ui {
     }
 //----- generate HTML for an array of list items --------------------
     li = function(array) {
-      array.map(function(v){<<<li>#{v}</li>
+      array.map(function(v){<<<li>#{v}<button>Contact</button></li>
 >>}).join("")
     }
 //------------- ordinal string in English for a positive integer-----
@@ -99,6 +99,7 @@ $(function(){
 </script>
 >>;
       <<#{header(my_name,scripts)}
+    <button style="float:right">export</button>
     <h1>#{my_name}</h1>
     <h2>#{me:tag_line()}</h2>
 <div style="border:1px dashed silver;padding:5px;float:left;cursor:pointer"></div>
