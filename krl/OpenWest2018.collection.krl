@@ -85,7 +85,7 @@ ruleset OpenWest2018.collection {
         ).klog("signed_message");
       verified_count = verified_message.decode();
     }
-    if verified_count{"count"} == connection_count then noop();
+    if verified_count{"connection_count"} == connection_count then noop();
     fired {
       ent:scores{key} := connection_count;
       raise attendees event "scores_changed" attributes event:attrs;
