@@ -38,11 +38,12 @@ ruleset OpenWest2018.collection {
       html{"error"} => html{"skyQueryError"} | html
     }
     place = function(pin) { // returns place and whether tied
+      total = ent:scores.keys().length();
       highs = high_scores();
       places = highs.keys();
       places_len = places.length();
       placement = function(v,k) {
-        { "place": k+1, "tied": v.length()>1, "out_of": places_len}
+        { "place": k+1, "tied": v.length()>1, "out_of": places_len, "total": total}
       };
       places.reduce(function(a,v,k){
         highs{v} >< pin => placement(highs{v},k) | a
