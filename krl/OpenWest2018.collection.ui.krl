@@ -32,7 +32,8 @@ ruleset OpenWest2018.collection.ui {
     }
     scores_dd = function(v){
       label = all:attendee_designation(v);
-      <<        <dd>#{label==v => v | "["+v+"] "+label}</dd>
+      style = "white-space:nowrap;overflow:hidden";
+      <<        <dd style="#{style}">#{label==v => v | "<!-- "+v+" --> "+label}</dd>
 >>
     }
     scores_dt = function(scores_map) {
@@ -49,11 +50,44 @@ ruleset OpenWest2018.collection.ui {
                                     | all_scores.keys();
       high_scores = all_scores
         .filter(function(v,k){high_score_keys >< k});
-      <<#{header("High Scores")}    <h1>High Scores</h1>
+      <<#{header("High Scores",css)}    <h1>Manifold Connection Collection</h1>
+    <div style="margin-left:100px">
+    <h2>Top Five Scores</h2>
     <dl>
 #{scores_dt(high_scores).join("")}
     </dl>
+    </div>
+    <div id="logo">
+      <img src="http://picos.byu.edu:8080/pico-logo-transparent-48x48.png" alt="Pico Labs logo">
+      <p style="margin:0;font-family:sans-serif">
+        <span style="color:#2DA2D9;margin-left:-10px">Pico Labs</span>
+        <a href="http://picolabs.io">http://picolabs.io/</a>
+      </p>
+    </div>
 #{footer()}>>
     }
+    css = <<<style type="text/css">
+body, html {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+body {
+  margin-left: 10px;
+  background-color: #2DA2D9;
+  background-image: linear-gradient(#2DA2D9, white);
+}
+h1 {
+  color: white;
+  text-transform: uppercase;
+  font-family: arial;
+}
+div#logo {
+  position: absolute;
+  bottom: 0;
+  left: 15px;
+}
+</style>
+>>;
   }
 }
