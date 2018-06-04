@@ -14,6 +14,7 @@ ruleset OpenWest2018.collection.ui {
       ]
     }
     pc_host = "http://picos.byu.edu:8080"
+    pl_color = "#2DA2D9";
     header = function(title,scripts) {
       <<<!DOCTYPE HTML>
 <html>
@@ -85,7 +86,7 @@ ruleset OpenWest2018.collection.ui {
     <div id="logo">
       <img src="http://picos.byu.edu:8080/pico-logo-transparent-48x48.png" alt="Pico Labs logo">
       <p style="margin:0;font-family:sans-serif">
-        <span style="color:#2DA2D9;margin-left:-10px">Pico Labs</span>
+        <span style="color:#{pl_color};margin-left:-10px">Pico Labs</span>
         <a href="http://picolabs.io"> http://picolabs.io/</a>
       </p>
     </div>
@@ -100,8 +101,8 @@ body, html {
 }
 body {
   margin-left: 10px;
-  background-color: #2DA2D9;
-  background-image: linear-gradient(#2DA2D9, white);
+  background-color: #{pl_color};
+  background-image: linear-gradient(#{pl_color}, white);
 }
 h1 {
   color: white;
