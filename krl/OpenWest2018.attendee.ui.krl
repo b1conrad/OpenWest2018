@@ -79,7 +79,7 @@ ruleset OpenWest2018.attendee.ui {
       connections = me:connections();
       progress = placement => render(placement.decode()) | "";
       possible = placement && placement.decode(){"total"}
-        => "/"+placement.decode(){"total"} | "";
+        => "/"+(placement.decode(){"total"}-1) | "";
       my_name = me:name();
       intro_url = <</sky/event/#{me:intro_channel_id()}/intro/tag/scanned>>;
       export_url = <</sky/event/#{me:intro_channel_id()}/export/export/json>>;
