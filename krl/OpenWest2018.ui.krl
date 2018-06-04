@@ -34,13 +34,15 @@ ruleset OpenWest2018.ui {
     }
     html = function(id,pin) {
       form_url = <<#{pc_host}/qr/tag/initials_provided>>;
-      <<#{header(pin,scripts)}<pre>id=#{id}</pre>
-<h1>#{pin}</h1>
+      <<#{header(pin,scripts)}<pre>pin=#{pin}</pre>
+<p>For the scoreboard:</p>
 <form action="#{form_url}">
+<p>Please enter a short name or your initials:</p>
 <input type="hidden" name="pin" value="#{pin}">
-<input name="name" placeholder="initials">
-<br>
-<input name="tag_line" placeholder="one-liner about me">
+<input name="name" placeholder="initials" size="10" maxlength="10">
+<p>Please enter a one line description of yourself:</p>
+<input name="tag_line" placeholder="one-liner about me" size="40" maxlength="140">
+<p></p>
 <input type="submit">
 </form>
 #{footer()}>>
@@ -95,6 +97,7 @@ ruleset OpenWest2018.ui {
       name = event:attr("name") || pin;
       html = <<#{header(name)}<h1>Welcome #{name}</h1>
 <h2><a href="#{page_url(pin)}">my page</a>!</h2>
+<p>Hint: take a screenshot of your page and/or request a sticker with your QR Code.</p>
 #{footer()}>>;
     }
     send_directive("_html",{"content":html});
