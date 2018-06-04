@@ -33,12 +33,7 @@ ruleset OpenWest2018.collection.ui {
     }
 
     as_ordinal = function(n) {
-      n == 1 => "First" |
-      n == 2 => "Second"|
-      n == 3 => "Third" |
-      n == 4 => "Fourth"|
-      n == 5 => "Fifth" |
-                n+"th"
+      ["First","Second","Third","Fourth","Fifth"][n-1] || n+"th"
     }
     scores_dd = function(v){
       label = all:attendee_designation(v);
@@ -49,7 +44,7 @@ ruleset OpenWest2018.collection.ui {
       scores_map.keys()
         .map(function(k,n){
           v = scores_map{k};
-          tied = v.length() > 1 => "<br>(tie)" | "";
+          tied = v.length() > 1 => "<br>("+v.length()+"-way tie)" | "";
           <<        <td>#{as_ordinal(n+1)}#{tied}</td>
         <td class="ra">#{k.replace("count=","")}</td>
         <td>#{v.map(scores_dd).join("<br>")}</td>
