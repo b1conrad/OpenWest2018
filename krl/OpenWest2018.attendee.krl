@@ -23,7 +23,12 @@ ruleset OpenWest2018.attendee {
     }
     connections = function() {
       Subs:established("Rx_role","peer")
-        .map(function(v){wrangler:skyQuery(v{"Tx"},meta:rid,"designation")})
+        .map(function(v){
+          { "designation":wrangler:skyQuery(v{"Tx"},meta:rid,"designation"),
+            "eci":v{"Tx"},
+            "contactable": engine:listInstalledRIDs() >< "OpenWest2018.contact_info"
+          }
+        })
     }
     connection_count = function() {
       Subs:established("Rx_role","peer").length();
