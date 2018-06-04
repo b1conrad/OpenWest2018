@@ -30,17 +30,28 @@ ruleset OpenWest2018.collection.ui {
 </html>
 >>
     }
+
+    as_ordinal = function(n) {
+      n == 1 => "First"  |
+      n == 2 => "Second" |
+      n == 3 => "Third"  |
+                n+"th"
+    }
     scores_dd = function(v){
       label = all:attendee_designation(v);
       style = "white-space:nowrap;overflow:hidden";
-      <<        <dd style="#{style}">#{label==v => v | "<!-- "+v+" --> "+label}</dd>
->>
+      <<#{label==v => v | "<!-- "+v+" --> "+label}>>
     }
-    scores_dt = function(scores_map) {
-      scores_map.klog("scores_map")
-        .map(function(v,k){
-          <<      <dt>#{k.replace("count=","")}</dt>
-#{v.map(scores_dd).join("")}>>}).values()
+    scores_row = function(scores_map) {
+      scores_map.keys()
+        .map(function(k,n){
+          v = scores_map{k};
+          tied = v.length() > 1 => "<br>(tie)" | "";
+          <<        <td>#{as_ordinal(n+1)}#{tied}</td>
+        <td class="ra">#{k.replace("count=","")}</td>
+        <td>#{v.map(scores_dd).join("<br>")}</td>
+>>
+        }).values()
     }
     show_top = 5;
     high_scores_page = function() {
@@ -51,17 +62,21 @@ ruleset OpenWest2018.collection.ui {
       high_scores = all_scores
         .filter(function(v,k){high_score_keys >< k});
       <<#{header("High Scores",css)}    <h1>Manifold Connection Collection</h1>
-    <div style="margin-left:100px">
+    <div style="margin-left:100px;width:100%">
     <h2>Top Five Scores</h2>
-    <dl>
-#{scores_dt(high_scores).join("")}
-    </dl>
+    <table style="max-width:100%">
+      <tr><th>place</th><th class="ra">connections</th><th>winner</th></tr>
+      <tr>
+#{scores_row(high_scores).join("      </tr>
+      <tr>
+")}      </tr>
+    </table>
     </div>
     <div id="logo">
       <img src="http://picos.byu.edu:8080/pico-logo-transparent-48x48.png" alt="Pico Labs logo">
       <p style="margin:0;font-family:sans-serif">
         <span style="color:#2DA2D9;margin-left:-10px">Pico Labs</span>
-        <a href="http://picolabs.io">http://picolabs.io/</a>
+        <a href="http://picolabs.io"> http://picolabs.io/</a>
       </p>
     </div>
 #{footer()}>>
@@ -86,6 +101,28 @@ div#logo {
   position: absolute;
   bottom: 0;
   left: 15px;
+}
+p a {
+  text-decoration: none;
+  text-transform: uppercase;
+  font-family: arial;
+  font-size: 80%;
+}
+table {
+  border-spacing: 5px 10px;
+}
+th {
+  text-align: left;
+}
+td {
+  vertical-align: top;
+  max-width:100%;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow: ellipsis;
+}
+th.ra, td.ra {
+  text-align: right;
 }
 </style>
 >>;
