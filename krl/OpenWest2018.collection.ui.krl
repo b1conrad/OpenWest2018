@@ -67,14 +67,19 @@ ruleset OpenWest2018.collection.ui {
     <table style="max-width:100%">
       <tr>
         <th>place</th>
-        <th class="ra">connections
-          <br>(#{all:connections_possible()} possible)
-        </th>
-        <th>winner</th></tr>
+        <th class="ra">connections*</th>
+        <th>winner</th>
+      </tr>
       <tr>
 #{scores_row(high_scores).join("      </tr>
       <tr>
 ")}      </tr>
+      <tr>
+        <th></th>
+        <th class="ra">*#{all:connections_possible()} possible</th>
+        <th></th>
+      </tr>
+      <tr>
     </table>
     </div>
     <div id="logo">
@@ -86,7 +91,8 @@ ruleset OpenWest2018.collection.ui {
     </div>
 #{footer()}>>
     }
-    css = <<<style type="text/css">
+    css = <<<link rel="stylesheet" href="https://use.typekit.net/miv2swc.css">
+<style type="text/css">
 body, html {
   height: 100%;
   width: 100%;
@@ -100,7 +106,16 @@ body {
 h1 {
   color: white;
   text-transform: uppercase;
-  font-family: arial;
+  font-family: rift;
+  font-weight: 300;
+  font-size: 3em;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+h2 {
+  font-family: chantal,sans-serif;
+  font-size: 2em;
+  margin: 0;
 }
 div#logo {
   position: absolute;
@@ -110,16 +125,17 @@ div#logo {
 p a {
   text-decoration: none;
   text-transform: uppercase;
-  font-family: arial;
-  font-size: 80%;
+  font-family: rift;
+  font-weight: 500;
 }
 table {
-  border-spacing: 5px 10px;
+  border-spacing: 10px 10px;
 }
 th {
   text-align: left;
   vertical-align: top;
   white-space:nowrap;
+  font-family: chantal,sans-serif;
 }
 td {
   vertical-align: top;
@@ -127,9 +143,12 @@ td {
   white-space:nowrap;
   overflow:hidden;
   text-overflow: ellipsis;
+  font-family: sans-serif;
+  font-weight: 200;
 }
-th.ra, td.ra {
+td.ra {
   text-align: right;
+  padding-right: 11px;
 }
 </style>
 >>;
