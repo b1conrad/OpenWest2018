@@ -65,7 +65,12 @@ ruleset OpenWest2018.collection.ui {
     <div style="margin-left:100px;width:100%">
     <h2>Top Five Scores</h2>
     <table style="max-width:100%">
-      <tr><th>place</th><th class="ra">connections</th><th>winner</th></tr>
+      <tr>
+        <th>place</th>
+        <th class="ra">connections
+          <br>(#{all:connections_possible()} possible)
+        </th>
+        <th>winner</th></tr>
       <tr>
 #{scores_row(high_scores).join("      </tr>
       <tr>
@@ -113,6 +118,8 @@ table {
 }
 th {
   text-align: left;
+  vertical-align: top;
+  white-space:nowrap;
 }
 td {
   vertical-align: top;

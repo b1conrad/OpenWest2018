@@ -2,7 +2,7 @@ ruleset OpenWest2018.collection {
   meta {
     use module io.picolabs.collection alias my
     use module io.picolabs.wrangler alias Wrangler
-    provides high_scores, attendee_designation
+    provides high_scores, attendee_designation, connections_possible
     shares __testing, my_members, high_scores, pin_as_Rx, about_pin, place
   }
   global {
@@ -11,6 +11,9 @@ ruleset OpenWest2018.collection {
                                { "name": "high_scores" },
                                { "name": "place", "args": [ "pin" ] } ],
                   "events": [{"domain":"attendees", "type": "need_sync"}] }
+    connections_possible = function(){
+      my:members().length()-1
+    }
     my_members = function(){
       my:members()
     }
