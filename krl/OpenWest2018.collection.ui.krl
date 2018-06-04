@@ -33,9 +33,11 @@ ruleset OpenWest2018.collection.ui {
     }
 
     as_ordinal = function(n) {
-      n == 1 => "First"  |
-      n == 2 => "Second" |
-      n == 3 => "Third"  |
+      n == 1 => "First" |
+      n == 2 => "Second"|
+      n == 3 => "Third" |
+      n == 4 => "Fourth"|
+      n == 5 => "Fifth" |
                 n+"th"
     }
     scores_dd = function(v){
