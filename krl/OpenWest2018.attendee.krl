@@ -87,10 +87,13 @@ ruleset OpenWest2018.attendee {
     select when about_me new_tag_line
     pre {
       tag_line = event:attr("tag_line");
+      clear_HTML = function(input){
+        input.replace(re#<#g,"＜").replace(re#>#g,"＞")
+      };
     }
     if not tag_line.isnull() then noop();
     fired {
-      ent:tag_line := tag_line;
+      ent:tag_line := clear_HTML(tag_line);
     }
   }
   rule name_provided {
