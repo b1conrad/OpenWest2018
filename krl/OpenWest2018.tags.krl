@@ -17,7 +17,7 @@ ruleset OpenWest2018.tags {
     }
     child_specs = {
       "rids": ["io.picolabs.subscription","OpenWest2018.attendee"] };
-    MDT = function(ts) {time:add(ts,{"hours": -6})}
+    MDT = function(ts) {time:add(ts,{"hours": -6}).replace(re#[T.Z]#g," ")}
     timestamps = function() {
       ent:owners
         .keys()
@@ -66,7 +66,7 @@ ruleset OpenWest2018.tags {
   rule scanner_unknown {
     select when tag scanned id re#^(\d{15})$# setting(id)
     pre {
-      whoami = cookies:cookies(){"whoami"};
+      whoami = cookies:cookies(){"whoami"}.klog("scanned_by");
     }
     if whoami.isnull()
       then send_directive("unknown scanner",{"id": id,"page":"recovery"});
