@@ -1,6 +1,7 @@
 ruleset OpenWest2018.collection {
   meta {
     use module io.picolabs.collection alias my
+    use module io.picolabs.cookies alias cookies
     use module io.picolabs.wrangler alias Wrangler
     provides high_scores, attendee_designation, connections_possible
     shares __testing, my_members, high_scores, pin_as_Rx, about_pin, place
@@ -34,11 +35,16 @@ ruleset OpenWest2018.collection {
         .filter(function(v){v==pin})
         .keys().head()
     }
-    about_pin = function(pin) {
-      Tx = pin_as_Rx(pin);
-      html = Wrangler:skyQuery(Tx, "OpenWest2018.attendee.ui", "about_me",
-        {"placement": place(pin).encode()});
-      html{"error"} => html{"skyQueryError"} | html
+    about_pin = function(pin,_headers) {
+      scanner = cookies:cookies(_headers){"whoami"};
+      get_page = function(){
+        Tx = pin_as_Rx(pin);
+        html = Wrangler:skyQuery(Tx, "OpenWest2018.attendee.ui", "about_me",
+          {"placement": place(pin).encode()});
+        html{"error"} => html{"skyQueryError"} | html
+      };
+      scanner == pin => get_page()
+                      | <<{"directives": [ ]}>>
     }
     place = function(pin) { // returns place and whether tied
       total = ent:scores.keys().length();
