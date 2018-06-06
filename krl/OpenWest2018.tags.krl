@@ -30,6 +30,7 @@ ruleset OpenWest2018.tags {
     if ent:owners.isnull() then noop();
     fired {
       ent:owners := {};
+      ent:need_initials := [];
     }
   }
   rule reject_invalid_tag {
@@ -48,16 +49,18 @@ ruleset OpenWest2018.tags {
     select when tag scanned id re#^(\d{15})$# setting(id)
     pre {
       key = id;
+      pin = ids:as_pin(id);
     }
     if not (ent:owners >< key) then every {
       send_directive("first scan",{"id": id,"page":"sign-up"});
       event:send({"eci":wrangler:parent_eci(),
         "domain": "owner", "type": "creation",
-        "attrs": child_specs.put({"name":ids:as_pin(id)})
+        "attrs": child_specs.put({"name":pin})
       });
     }
     fired {
       ent:owners{key} := time:now();
+      ent:need_initials := ent:need_initials.defaultsTo([]).union([pin]);
       raise ids event "id_used" attributes event:attrs;
       raise tag event "first_scan" attributes event:attrs;
       last;
@@ -67,11 +70,14 @@ ruleset OpenWest2018.tags {
     select when tag scanned id re#^(\d{15})$# setting(id)
     pre {
       whoami = cookies:cookies(){"whoami"}.klog("scanned_by");
+      pin = ids:as_pin(id);
+      need_initials = ent:need_initials >< pin;
     }
     if whoami.isnull()
       then send_directive("unknown scanner",{"id": id,"page":"recovery"});
     fired {
-      raise tag event "recovery_needed" attributes event:attrs;
+      raise tag event "recovery_needed" attributes event:attrs if not need_initials;
+      raise tag event "still_need_initials" attributes event:attrs if need_initials;
       last;
     } else {
       ent:scanned_by := whoami;
@@ -81,6 +87,8 @@ ruleset OpenWest2018.tags {
     select when tag scanned id re#^(\d{15})$# setting(id)
     pre {
       key = id;
+      pin = ids:as_pin(id);
+      need_initials = ent:need_initials >< pin;
     }
     if ent:owners >< key
       then send_directive("subsequent scan",
@@ -89,7 +97,8 @@ ruleset OpenWest2018.tags {
         });
     fired {
       raise tag event "subsequent_scan"
-        attributes event:attrs.put("scanned_by", ent:scanned_by);
+        attributes event:attrs.put("scanned_by", ent:scanned_by) if not need_initials;
+      raise tag event "still_need_initials" attributes event:attrs if need_initials;
     } finally {
       clear ent:scanned_by;
     }
@@ -108,6 +117,9 @@ ruleset OpenWest2018.tags {
       event:send({"eci":eci, "domain": "attendees", "type": "initials_provided",
         "attrs": pass_along_attrs
       });
+    fired {
+      ent:need_initials := ent:need_initials.difference([pin]);
+    }
   }
   rule tag_recovery_codes_provided {
     select when tag recovery_codes_provided id re#^(\d{15})$# setting(id)

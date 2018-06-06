@@ -50,6 +50,7 @@ ruleset OpenWest2018.ui {
   }
   rule tag_first_scan {
     select when tag first_scan
+             or tag still_need_initials
     pre {
       id = event:attr("id");
       pin = ids:as_pin(id);
