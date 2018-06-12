@@ -1,0 +1,7 @@
+RewriteEngine On
+
+RewriteCond "%{HTTP_HOST}" "^picos[.]" [NC]
+
+RewriteRule "^openwest/topfive/?$" "/cgi-bin/topfive.cgi" [NC,L]
+
+RewriteRule "^openwest/?$" "http://picolabs.io/openwest/" [NC,L,R]
