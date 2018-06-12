@@ -65,7 +65,7 @@ ruleset OpenWest2018.attendee {
           "Rx_role": "member", "Tx_role": "collection", 
           "name": ent:pin, "channel_type": "subscription" };
       raise wrangler event "install_rulesets_requested"
-        attributes { "rid": "OpenWest2018.attendee.ui" }
+        attributes { "rids": ["OpenWest2018.attendee.ui", "io.picolabs.pds", "OpenWest2018.contact_info", "OpenWest2018.export"] }
     }
   }
   rule record_intro_channel {

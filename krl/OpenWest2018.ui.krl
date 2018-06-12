@@ -34,17 +34,32 @@ ruleset OpenWest2018.ui {
     }
     html = function(id,pin) {
       form_url = <<#{pc_host}/qr/tag/initials_provided>>;
-      <<#{header(pin,scripts)}<pre>pin=#{pin}</pre>
-<p>For the scoreboard:</p>
-<form action="#{form_url}">
-<p>Please enter a short name or your initials:</p>
-<input type="hidden" name="pin" value="#{pin}">
-<input name="name" placeholder="initials" size="10" maxlength="10">
-<p>Please enter a one line description of yourself:</p>
-<input name="tag_line" placeholder="one-liner about me" size="40" maxlength="140">
-<p></p>
-<input type="submit">
-</form>
+      scripts = <<    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://picos.byu.edu:8080/css/picomobile.css">
+    <link rel="stylesheet" href="https://use.typekit.net/miv2swc.css">
+>>;
+      <<#{header("My Information",scripts)}
+    <header class="bar card blue">
+        <h1 class="bar-item">Pico Created</h1>
+    </header>
+
+    <pre>pin=#{pin}</pre>
+    <p>For the scoreboard:</p>
+    <form action="#{form_url}">
+    <h5>Please enter a short name or your initials:</h5>
+    <input type="hidden" name="pin" value="#{pin}">
+    <input type="text" name="name" placeholder="initials" size="10" maxlength="10">
+    <h5>Please enter a one line description of yourself:</h5>
+    <input type="text" name="tag_line" placeholder="one-liner about me" size="40" maxlength="140">
+    <p></p>
+    <input type="submit">
+    </form>
+
+    <br><br><br><br><br><br><br><br><br>
+
+    <footer class="container bottom blue">
+      <div class="center"><h4>Contact. Connect. Collect!</h4></div>
+    </footer>
 #{footer()}>>
     }
   }

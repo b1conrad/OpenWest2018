@@ -25,7 +25,9 @@ ruleset OpenWest2018.attendee.ui {
 <html>
   <head>
     <title>#{title}</title>
-    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://picos.byu.edu:8080/css/picomobile.css">
+    <link rel="stylesheet" href="https://use.typekit.net/miv2swc.css">
 #{scripts.defaultsTo("")}
   </head>
   <body>
@@ -40,8 +42,24 @@ ruleset OpenWest2018.attendee.ui {
     }
 //----- generate HTML for an array of list items --------------------
     li = function(array) {
-      array.map(function(v){<<<li>#{v}<button>Contact</button></li>
+      array.map(function(v){
+        designation = v{"designation"}.klog("designation");
+        ok_to_contact = v{"contactable"}.klog("ok_to_contact");
+        button = ok_to_contact => <<<button id="contact#{array.index(v)}">Contact</button> >>
+          | "";
+        <<<li>#{designation}</li>
 >>}).join("")
+    }
+//------ generate html to raise unique events for each button
+
+    contact_buttons = function(array) {
+      contact_channel = me:connections().map(function(c){c{"eci"}});
+      array.map(function(v){
+      contact_url = <</sky/event/#{contact_channel[array.index(v)]}/contact_clicked/contact/getter>>;
+      <<var contact#{array.index(v)} = "#{pc_host + contact_url}";
+      $("#contact#{array.index(v)}").click(function(){location=contact#{array.index(v)}});
+      >>
+      }).join("")
     }
 
 //------------- ordinal string in English for a positive integer-----
@@ -76,7 +94,7 @@ ruleset OpenWest2018.attendee.ui {
 //----------- generate HTML for the about me page ------------------
 //
     about_me = function(placement) {
-      connections = me:connections();
+      connections = me:connections().klog("connections");
       progress = placement => render(placement.decode()) | "";
       possible = placement && placement.decode(){"total"}
         => "/"+(placement.decode(){"total"}-1) | "";
@@ -92,31 +110,87 @@ ruleset OpenWest2018.attendee.ui {
 <script type="text/javascript">
 $(function(){
       var url = "#{pc_host + intro_url}";
-      $("div").qrcode(url);
-      $("div").click(function(){location=url});
+      $("#cs").qrcode(url);
+      $("#cs").click(function(){location=url});
       var canvas = $("div canvas").get(0);
       var context = canvas.getContext("2d");
       var logo = new Image();
-      logo.src = "#{pc_host}/pico-logo-48x48.png";
+      logo.src = "http://picos.byu.edu:8080/pico-logo-48x48.png";
       logo.onload = function(){
         context.drawImage(logo,104,104);
       }
+
       var export_url = "#{pc_host + export_url}";
       $("#export").click(function(){location=export_url});
-});
-</script>
+
+
+          closeMenubar();
+        });
+
+
+        function openMenubar() {
+          document.getElementById("myMenu").style.display = "block";
+        }
+
+        function closeMenubar() {
+          document.getElementById("myMenu").style.display = "none";
+        }
+    </script>
 >>;
-      <<#{header(my_name,scripts)}#{export_button}
-    <h1>#{my_name}</h1>
-    <h2>#{me:tag_line()}</h2>
-<div style="border:1px dashed silver;padding:5px;float:left;cursor:pointer"></div>
-<br clear="all">
-<p>pin: #{me:pin()} #{progress}</p>
-<p>
-Connections (#{connections.length()}#{possible}):
-<ul>
-#{li(connections)}</ul>
-</p>
+
+//start of the body html
+      <<#{header(my_name,scripts)}
+
+      <nav class="menubar block card" id="myMenu">
+        <div class="container light-blue">
+          <span onclick="closeMenubar()" class="button show-topright small">X</span>
+          <br>
+          <div class="padding center">
+            <h2>Menu</h2>
+          </div>
+        </div>
+        <a class="bar-item button" href="#">Home</a>
+        <a class="bar-item button" href="http://picos.byu.edu:8080/sky/event/#{meta:eci}/contactTest/contact/getter">Contacts</a>
+        <a class="bar-item button" href="http://picos.byu.edu:8080/sky/event/#{meta:eci}/contactTest/contact/setter_ui">My Information</a>
+      </nav>
+
+      <!-- COMBINED NAME AND PHRASE AND PUT IN CARD-->
+    <header class="bar card blue">
+      <button class="bar-item button large w3-hover-theme" onclick="openMenubar()">&#9776;</button>
+        #{export_button}
+        <h1 class="bar-item">#{my_name}</h1>
+    </header>
+    <p>#{me:tag_line()}</p>
+    <hr>
+    <div class="row">
+      <div class="center" style="width:100%">
+        <div class="center" style="cursor:pointer;" id="cs"></div>
+    </div>
+      <hr>
+      <div class="row">
+        <h3>#{progress}</h3>
+        <p>Your pin is #{me:pin()}</p>
+        <hr>
+        <p>
+          Connections (#{connections.length()}#{possible}):
+          <ul>
+          #{li(connections)}</ul>
+        </p>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+      </div>
+
+      <footer class="container bottom blue" style="background:#D5ECF6">
+        <div class="center"><h4 style="margin:0">Contact. Connect. Collect!</h4></div>
+      </footer>
+
 #{footer()}>>
     }
     my_page_link = function(pin) {
@@ -161,10 +235,28 @@ You are already connected to #{event:attr("designation")}
   }
   rule notify_connection {
     select when attendee connected
-    send_directive("_html",{"content":<<#{header("Connected")}<p>
-You are now connected to #{event:attr("designation")}
-</p>
-#{my_page_link(event:attr("scanner_pin"))}
-#{footer()}>>});
+    pre {pin = event:attr("scanner_pin");}
+    send_directive("_html",{"content":<<
+
+    <html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://picos.byu.edu:8080/css/picomobile.css">
+    <link rel="stylesheet" href="https://use.typekit.net/miv2swc.css">
+    <title>My Information</title>
+  </head>
+  <body>
+    <header class="bar card blue">
+        <h1 class="bar-item">Pico Created</h1>
+    </header>
+    <form action="#{pc_host}/OpenWest2018.collection/about_pin.html?pin=#{pin};>
+      <input type="submit" value="My Page">
+    </form>
+    <footer class="container bottom blue">
+      <div class="center"><h4>Contact. Connect. Collect!</h4></div>
+    </footer>
+  </body>
+</html>
+    >>});
   }
 }
