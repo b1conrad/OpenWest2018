@@ -127,9 +127,11 @@ ruleset OpenWest2018.tags {
       date = event:attr("date");
       time = event:attr("time");
       millis = event:attr("millis");
-      ts = time:add(<<#{date}T#{time}.#{millis}Z>>,{"hours":6});
+      et = <<#{date}T#{time}.#{millis}Z>>.klog("et");
+      ts = et like re#^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[.]\d{3}Z$#
+        => time:add(et,{"hours":6}) | "";
     }
-    if ent:owners{id} == ts then
+    if ent:owners{id} == ts.klog("ts") then
       send_directive("recovery_codes_accepted");
     fired {
       raise tag event "recovery_codes_accepted" attributes {
