@@ -5,13 +5,19 @@ ruleset OpenWest2018.collection {
     use module io.picolabs.wrangler alias Wrangler
     provides high_scores, attendee_designation, connections_possible
     shares __testing, my_members, high_scores, pin_as_Rx, about_pin, place
+      , sizes
   }
   global {
     __testing = { "queries": [ { "name": "__testing" },
                                { "name": "my_members" },
                                { "name": "high_scores" },
+                               { "name": "pin_as_Rx", "args": [ "pin" ] },
                                { "name": "place", "args": [ "pin" ] } ],
                   "events": [{"domain":"attendees", "type": "need_sync"}] }
+    sizes = function(){
+      [ent:attendees.length(),ent:scores.length(),
+        connections_possible(),ent:old_scores.length()]
+    }
     connections_possible = function(){
       my:members().length()-1
     }
@@ -19,8 +25,9 @@ ruleset OpenWest2018.collection {
       my:members()
     }
     attendee_designation = function(pin) {
-      key = pin_as_Rx(pin);
-      designation = Wrangler:skyQuery(key, "OpenWest2018.attendee", "designation");
+      key = pin_as_Rx(pin.klog("pin")).klog("key");
+      designation = Wrangler:skyQuery(key, "OpenWest2018.attendee", "designation")
+        .klog("designation");
       designation{"error"} => pin | designation
     }
     high_scores = function() {
@@ -47,7 +54,7 @@ ruleset OpenWest2018.collection {
                       | <<{"directives": [ ]}>>
     }
     place = function(pin) { // returns place and whether tied
-      total = ent:scores.keys().length();
+      total = ent:attendees.keys().length();
       highs = high_scores();
       places = highs.keys();
       places_len = places.length();
@@ -77,10 +84,14 @@ ruleset OpenWest2018.collection {
       name = ent:attendees{key};
       temp = Wrangler:skyQuery(key, "OpenWest2018.attendee", "connection_count");
       connection_count = temp like re#\d+# => temp.as("Number") | 0;
+      old_connection_count = ent:old_scores{key}.defaultsTo(0);
+      new_connection_count = 
+        connection_count == 0 => 0
+                               | connection_count - old_connection_count;
     }
     fired {
       ent:attendees{key.klog("key")} := name.klog("name");
-      ent:scores{key} := connection_count;
+      ent:scores{key} := new_connection_count;
     }
   }
   rule update_high_scores {
@@ -97,7 +108,7 @@ ruleset OpenWest2018.collection {
     }
     if verified_count{"connection_count"} == connection_count then noop();
     fired {
-      ent:scores{key} := connection_count;
+      ent:scores{key} := connection_count - ent:old_scores{key}.defaultsTo(0);
       raise attendees event "scores_changed" attributes event:attrs;
     } else {
       raise attendees event "under_attack" attributes event:attrs.put({
@@ -123,6 +134,13 @@ ruleset OpenWest2018.collection {
       event:send({"eci": eci, "domain": "about_me", "type": "sign_up_complete",
         "attrs": event:attrs
       });
+    }
+  }
+  rule roll_over_past_scores {
+    select when attendees new_day
+    if ent:old_scores.isnull() then noop();
+    fired {
+      ent:old_scores := {}.put(ent:scores);
     }
   }
 }
