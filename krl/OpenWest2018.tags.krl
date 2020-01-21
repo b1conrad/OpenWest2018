@@ -124,8 +124,9 @@ ruleset OpenWest2018.tags {
   rule tag_recovery_codes_provided {
     select when tag recovery_codes_provided id re#^(\d{15})$# setting(id)
     pre {
-      date = event:attr("date");
-      time = event:attr("time");
+      temp = ent:owners{id};
+      date = event:attr("date") || temp.substr(0,10);
+      time = event:attr("time") || temp.substr(11,8);
       millis = event:attr("millis");
       et = <<#{date}T#{time}.#{millis}Z>>.klog("et");
       ts = et like re#^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[.]\d{3}Z$#
